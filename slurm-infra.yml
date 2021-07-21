@@ -1,5 +1,6 @@
 ---
 
+# Provision the infrastructure using Terraform
 - hosts: openstack
   roles:
     - role: terraform_infra
@@ -14,10 +15,21 @@
           key_pair: "{{ cluster_key_pair }}"
           compute_count: "{{ compute_count }}"
           login_image: "{{ cluster_image }}"
+          control_image: "{{ cluster_image }}"
           compute_image: "{{ cluster_image }}"
           login_flavor: "{{ login_flavor }}"
+          control_flavor: "{{ login_flavor }}"
           compute_flavor: "{{ compute_flavor }}"
+
+# Wait for the cluster hosts to become available
+- hosts: cluster
+  gather_facts: no
+  tasks:
+    - name: Wait for host to become accessible
+      wait_for_connection:
+        # Wait for 10 mins for host to become available
+        timeout: 600
 
 - hosts: cluster
   tasks:
-    - ping:
+    - debug: var=group_names

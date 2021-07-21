@@ -28,6 +28,11 @@ variable "login_image" {
   description = "The ID of the CentOS 8 image to use for the login node"
 }
 
+variable "control_image" {
+  type = string
+  description = "The ID of the CentOS 8 image to use for the control node"
+}
+
 variable "compute_image" {
   type = string
   description = "The ID of the CentOS 8 image to use for the compute nodes"
@@ -36,6 +41,11 @@ variable "compute_image" {
 variable "login_flavor" {
   type = string
   description = "The ID of the flavor to use for the login node"
+}
+
+variable "control_flavor" {
+  type = string
+  description = "The ID of the flavor to use for the control node"
 }
 
 variable "compute_flavor" {

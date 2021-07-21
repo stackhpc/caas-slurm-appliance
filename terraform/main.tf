@@ -11,58 +11,33 @@ terraform {
 ##### Security groups for the cluster
 #####
 
+# Security group to hold common rules for the cluster
+resource "openstack_networking_secgroup_v2" "secgroup_slurm_cluster" {
+  name                 = "${var.cluster_name}-secgroup-slurm-cluster"
+  description          = "Rules for the slurm cluster nodes"
+  delete_default_rules = true   # Fully manage with terraform
+}
+
+# Security group to hold specific rules for the login node
 resource "openstack_networking_secgroup_v2" "secgroup_slurm_login" {
   name                 = "${var.cluster_name}-secgroup-slurm-login"
-  description          = "Rules for the slurm login node"
+  description          = "Specific rules for the slurm login node"
   delete_default_rules = true   # Fully manage with terraform
 }
 
-resource "openstack_networking_secgroup_v2" "secgroup_slurm_compute" {
-  name                 = "${var.cluster_name}-secgroup-slurm-compute"
-  description          = "Rules for the slurm compute node"
-  delete_default_rules = true   # Fully manage with terraform
-}
-
-## Allow all egress for login and compute nodes
-resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_egress_v4" {
+## Allow all egress for all cluster nodes
+resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_cluster_rule_egress_v4" {
   direction         = "egress"
   ethertype         = "IPv4"
-  security_group_id = openstack_networking_secgroup_v2.secgroup_slurm_login.id
-}
-resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_compute_rule_egress_v4" {
-  direction         = "egress"
-  ethertype         = "IPv4"
-  security_group_id = openstack_networking_secgroup_v2.secgroup_slurm_compute.id
+  security_group_id = openstack_networking_secgroup_v2.secgroup_slurm_cluster.id
 }
 
 ## Allow all ingress between nodes in the cluster
-# login -> login
-resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_ingress_login_v4" {
+resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_cluster_rule_ingress_internal_v4" {
   direction         = "ingress"
   ethertype         = "IPv4"
-  remote_group_id   = openstack_networking_secgroup_v2.secgroup_slurm_login.id
-  security_group_id = openstack_networking_secgroup_v2.secgroup_slurm_login.id
-}
-# compute -> login
-resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_ingress_compute_v4" {
-  direction         = "ingress"
-  ethertype         = "IPv4"
-  remote_group_id   = openstack_networking_secgroup_v2.secgroup_slurm_compute.id
-  security_group_id = openstack_networking_secgroup_v2.secgroup_slurm_login.id
-}
-# login -> compute
-resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_compute_rule_ingress_login_v4" {
-  direction         = "ingress"
-  ethertype         = "IPv4"
-  remote_group_id   = openstack_networking_secgroup_v2.secgroup_slurm_login.id
-  security_group_id = openstack_networking_secgroup_v2.secgroup_slurm_compute.id
-}
-# compute -> compute
-resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_compute_rule_ingress_compute_v4" {
-  direction         = "ingress"
-  ethertype         = "IPv4"
-  remote_group_id   = openstack_networking_secgroup_v2.secgroup_slurm_compute.id
-  security_group_id = openstack_networking_secgroup_v2.secgroup_slurm_compute.id
+  remote_group_id   = openstack_networking_secgroup_v2.secgroup_slurm_cluster.id
+  security_group_id = openstack_networking_secgroup_v2.secgroup_slurm_cluster.id
 }
 
 ## Allow ingress on port 22 (SSH) from anywhere for the login nodes
@@ -88,7 +63,21 @@ resource "openstack_compute_instance_v2" "login" {
   network {
     name = var.cluster_network
   }
-  security_groups = [openstack_networking_secgroup_v2.secgroup_slurm_login.name]
+  security_groups = [
+    openstack_networking_secgroup_v2.secgroup_slurm_cluster.name,
+    openstack_networking_secgroup_v2.secgroup_slurm_login.name
+  ]
+}
+
+resource "openstack_compute_instance_v2" "control" {
+  name      = "${var.cluster_name}-control-0"
+  image_id  = var.control_image
+  flavor_id = var.control_flavor
+  key_pair  = var.key_pair
+  network {
+    name = var.cluster_network
+  }
+  security_groups = [openstack_networking_secgroup_v2.secgroup_slurm_cluster.name]
 }
 
 resource "openstack_compute_instance_v2" "compute" {
@@ -101,7 +90,7 @@ resource "openstack_compute_instance_v2" "compute" {
   network {
     name = var.cluster_network
   }
-  security_groups = [openstack_networking_secgroup_v2.secgroup_slurm_compute.name]
+  security_groups = [openstack_networking_secgroup_v2.secgroup_slurm_cluster.name]
 }
 
 
