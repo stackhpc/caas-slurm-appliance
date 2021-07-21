@@ -1,0 +1,23 @@
+---
+
+- hosts: openstack
+  roles:
+    - role: terraform_infra
+      vars:
+        # Variables controlling the Terraform provisioning
+        terraform_project_path: "{{ playbook_dir }}/terraform"
+        terraform_state: "{{ cluster_state | default('present') }}"
+        terraform_variables:
+          cluster_name: "{{ cluster_name }}"
+          cluster_network: "{{ cluster_network }}"
+          cluster_floating_ip: "{{ cluster_floating_ip }}"
+          key_pair: "{{ cluster_key_pair }}"
+          compute_count: "{{ compute_count }}"
+          login_image: "{{ cluster_image }}"
+          compute_image: "{{ cluster_image }}"
+          login_flavor: "{{ login_flavor }}"
+          compute_flavor: "{{ compute_flavor }}"
+
+- hosts: cluster
+  tasks:
+    - ping:
