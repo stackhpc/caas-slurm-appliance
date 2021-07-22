@@ -5,3 +5,4 @@
 *.tfstate.backup
 .python-version
 inventory.*
+__pycache__

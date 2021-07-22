@@ -21,15 +21,6 @@
           control_flavor: "{{ login_flavor }}"
           compute_flavor: "{{ compute_flavor }}"
 
-# Wait for the cluster hosts to become available
-- hosts: cluster
-  gather_facts: no
-  tasks:
-    - name: Wait for host to become accessible
-      wait_for_connection:
-        # Wait for 10 mins for host to become available
-        timeout: 600
-
 - hosts: cluster
   tasks:
     - debug: var=group_names
