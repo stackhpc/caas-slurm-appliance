@@ -10,19 +10,19 @@ output "cluster_nodes" {
       {
         name          = openstack_compute_instance_v2.login.name
         ip            = openstack_compute_instance_v2.login.network[0].fixed_ip_v4
-        primary_group = "login"
+        primary_group = "${var.cluster_name}_login"
       },
       {
         name          = openstack_compute_instance_v2.control.name
         ip            = openstack_compute_instance_v2.control.network[0].fixed_ip_v4
-        primary_group = "control"
+        primary_group = "${var.cluster_name}_control"
       }
     ],
     [
       for compute in openstack_compute_instance_v2.compute: {
         name          = compute.name
         ip            = compute.network[0].fixed_ip_v4
-        primary_group = "compute"
+        primary_group = "${var.cluster_name}_compute"
       }
     ]
   )
@@ -39,20 +39,23 @@ output "cluster_nodes" {
 output "cluster_groups" {
   description = "A mapping of groups to their child groups"
   value = {
-    "openhpc" = ["login", "control", "compute"]
-    "cluster" = ["openhpc"]
-    "selinux" = ["cluster"]
-    "podman" = ["opendistro", "kibana", "filebeat"]
-    "nfs" = ["openhpc"]
-    "mysql" = ["control"]
-    "prometheus" = ["control"]
-    "grafana" = ["control"]
-    "alertmanager" = ["control"]
+    "login"         = ["${var.cluster_name}_login"]
+    "control"       = ["${var.cluster_name}_control"]
+    "compute"       = ["${var.cluster_name}_compute"]
+    "openhpc"       = ["login", "control", "compute"]
+    "cluster"       = ["openhpc"]
+    "selinux"       = ["cluster"]
+    "podman"        = ["opendistro", "kibana", "filebeat"]
+    "nfs"           = ["openhpc"]
+    "mysql"         = ["control"]
+    "prometheus"    = ["control"]
+    "grafana"       = ["control"]
+    "alertmanager"  = ["control"]
     "node_exporter" = ["cluster"]
-    "opendistro" = ["control"]
-    "kibana" = ["control"]
-    "slurm_stats" = ["control"]
-    "filebeat" = ["slurm_stats"]
-    "update" = ["cluster"]
+    "opendistro"    = ["control"]
+    "kibana"        = ["control"]
+    "slurm_stats"   = ["control"]
+    "filebeat"      = ["slurm_stats"]
+    "update"        = ["cluster"]
   }
 }

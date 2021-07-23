@@ -1,0 +1,2 @@
+# Modify to account for the fact we are running outside of the expected environment system
+filebeat_config_path: "{{ playbook_dir }}/../environments/common/files/filebeat/filebeat.yml"

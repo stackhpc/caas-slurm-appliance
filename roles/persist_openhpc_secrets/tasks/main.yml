@@ -1,0 +1,20 @@
+---
+
+- name: Check if OpenHPC secrets exist
+  stat:
+    path: /etc/ansible/facts.d/openhpc_secrets.fact
+  register: openhpc_secrets_stat
+
+- name: Persist OpenHPC secrets
+  block:
+    - name: Ensure Ansible facts directory exists
+      file:
+        path: /etc/ansible/facts.d
+        state: directory
+        recurse: yes
+     
+    - name: Write OpenHPC secrets
+      template:
+        src: openhpc_secrets.fact
+        dest: /etc/ansible/facts.d/openhpc_secrets.fact
+  when: "not openhpc_secrets_stat.stat.exists"

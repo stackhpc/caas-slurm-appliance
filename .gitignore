@@ -1,8 +1,8 @@
+.ansible
 .bin
 .terraform
 .terraform.lock.hcl
-*.tfstate
-*.tfstate.backup
+*.tfstate*
 .python-version
 inventory.*
 __pycache__

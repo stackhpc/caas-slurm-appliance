@@ -1,7 +1,8 @@
 ---
 
 # Provision the infrastructure using Terraform
-- hosts: openstack
+- name: Provision infrastructure
+  hosts: openstack
   roles:
     - role: terraform_infra
       vars:
@@ -21,6 +22,33 @@
           control_flavor: "{{ login_flavor }}"
           compute_flavor: "{{ compute_flavor }}"
 
-- hosts: cluster
+# Ensure that the secrets are generated and persisted on the control host
+- name: Generate and persist secrets
+  hosts: control
+  gather_facts: no
+  become: yes
+  roles: [persist_openhpc_secrets]
+
+# Configure the hosts as a Slurm cluster
+# Use the playbooks invidually rather than the site playbook as it avoids the
+# need to define the environment variables referencing an environment
+- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/validate.yml
+- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/bootstrap.yml
+- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/filesystems.yml
+- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/slurm.yml
+
+# Temporarily, the grafana_install tag is skipped (see ansible.cfg) and we install Grafana manually here
+# https://github.com/grafana/grafana/issues/36935
+# TODO: REMOVE THIS
+- name: Install Grafana
+  hosts: grafana
+  tags: grafana
+  become: yes
   tasks:
-    - debug: var=group_names
+    - name: Install Grafana from RPM
+      yum:
+        name: https://dl.grafana.com/oss/release/grafana-8.0.6-1.x86_64.rpm
+        disable_gpg_check: yes
+        state: present
+
+- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/monitoring.yml
