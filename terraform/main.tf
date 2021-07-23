@@ -55,11 +55,9 @@ resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_ingr
   security_group_id = openstack_networking_secgroup_v2.secgroup_slurm_login.id
 }
 
-
 #####
 ##### Cluster nodes
 #####
-
 
 resource "openstack_compute_instance_v2" "login" {
   name      = "${var.cluster_name}-login-0"
@@ -122,7 +120,6 @@ resource "openstack_compute_instance_v2" "compute" {
       %{ endfor }
   EOF
 }
-
 
 #####
 ##### Floating IP association for login node

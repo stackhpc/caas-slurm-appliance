@@ -8,6 +8,14 @@
       assert:
         that: "openstack_project_id != ''"
         msg: "openstack_project_id is not set"
+
+    # We need to convert the floating IP id to an address
+    - name: Look up floating IP
+      include_role:
+        name: terraform_infra
+        tasks_from: lookup_floating_ip
+      vars:
+        os_floating_ip_id: "{{ cluster_floating_ip }}"
   roles:
     - role: terraform_infra
       vars:
@@ -19,7 +27,7 @@
         terraform_variables:
           cluster_name: "{{ cluster_name }}"
           cluster_network: "{{ cluster_network }}"
-          cluster_floating_ip: "{{ cluster_floating_ip }}"
+          cluster_floating_ip: "{{ os_floating_ip_info.floating_ip_address }}"
           # We need to inject the user's SSH key and the deploy key for the cluster
           cluster_ssh_public_keys: "{{ [cluster_deploy_ssh_public_key, cluster_user_ssh_public_key] | to_json }}"
           compute_count: "{{ compute_count }}"
