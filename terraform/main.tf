@@ -55,11 +55,11 @@ resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_ingr
 ##### Cluster nodes
 #####
 
+
 resource "openstack_compute_instance_v2" "login" {
   name      = "${var.cluster_name}-login-0"
   image_id  = var.login_image
   flavor_id = var.login_flavor
-  key_pair  = var.key_pair
   network {
     name = var.cluster_network
   }
@@ -67,17 +67,34 @@ resource "openstack_compute_instance_v2" "login" {
     openstack_networking_secgroup_v2.secgroup_slurm_cluster.name,
     openstack_networking_secgroup_v2.secgroup_slurm_login.name
   ]
+  # Use cloud-init to inject the SSH keys
+  user_data = <<-EOF
+    #cloud-config
+
+    ssh_authorized_keys:
+      %{ for key in var.cluster_ssh_public_keys }
+      - ${key}
+      %{ endfor }
+  EOF
 }
 
 resource "openstack_compute_instance_v2" "control" {
   name      = "${var.cluster_name}-control-0"
   image_id  = var.control_image
   flavor_id = var.control_flavor
-  key_pair  = var.key_pair
   network {
     name = var.cluster_network
   }
   security_groups = [openstack_networking_secgroup_v2.secgroup_slurm_cluster.name]
+  # Use cloud-init to inject the SSH keys
+  user_data = <<-EOF
+    #cloud-config
+
+    ssh_authorized_keys:
+      %{ for key in var.cluster_ssh_public_keys }
+      - ${key}
+      %{ endfor }
+  EOF
 }
 
 resource "openstack_compute_instance_v2" "compute" {
@@ -86,11 +103,19 @@ resource "openstack_compute_instance_v2" "compute" {
   name      = "${var.cluster_name}-compute-${count.index}"
   image_id  = var.compute_image
   flavor_id = var.compute_flavor
-  key_pair  = var.key_pair
   network {
     name = var.cluster_network
   }
   security_groups = [openstack_networking_secgroup_v2.secgroup_slurm_cluster.name]
+  # Use cloud-init to inject the SSH keys
+  user_data = <<-EOF
+    #cloud-config
+
+    ssh_authorized_keys:
+      %{ for key in var.cluster_ssh_public_keys }
+      - ${key}
+      %{ endfor }
+  EOF
 }
 
 

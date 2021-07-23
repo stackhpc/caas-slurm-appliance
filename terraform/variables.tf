@@ -13,9 +13,9 @@ variable "cluster_floating_ip" {
   description = "The floating IP to associate with the login node"
 }
 
-variable "key_pair" {
-  type        = string
-  description = "The name of the OpenStack keypair to use"
+variable "cluster_ssh_public_keys" {
+  type = list(string)
+  description = "List of SSH public keys to grant access to the server"
 }
 
 variable "compute_count" {
