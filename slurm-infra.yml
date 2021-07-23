@@ -21,6 +21,14 @@
           login_flavor: "{{ login_flavor }}"
           control_flavor: "{{ login_flavor }}"
           compute_flavor: "{{ compute_flavor }}"
+  # If cluster validation was requested, add the cluster hosts to the openhpc_tests group
+  post_tasks:
+    - name: Add cluster hosts to openhpc_tests group
+      add_host:
+        name: "{{ item }}"
+        groups: openhpc_tests
+      loop: "{{ groups['cluster'] }}"
+      when: "cluster_run_validation | default(False) | bool"
 
 # Ensure that the secrets are generated and persisted on the control host
 - name: Generate and persist secrets
@@ -52,3 +60,4 @@
         state: present
 
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/monitoring.yml
+- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/adhoc/test.yml
