@@ -1,0 +1,6 @@
+# By default, look up the OpenStack project ID from the environment
+openstack_project_id: "{{ lookup('env', 'OS_PROJECT_ID') }}"
+# By default, don't run the cluster validation
+cluster_run_validation: no
+# By default, don't use a path prefix
+terraform_path_prefix: ""

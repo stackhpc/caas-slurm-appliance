@@ -16,6 +16,7 @@
     binary_path: "{{ terraform_binary_path }}"
     project_path: "{{ terraform_project_path }}"
     state: "{{ terraform_state }}"
+    backend_config: "{{ terraform_backend_config }}"
     force_init: yes
     variables: "{{ terraform_variables }}"
   register: terraform_provision

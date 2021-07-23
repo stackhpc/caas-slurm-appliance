@@ -3,12 +3,19 @@
 # Provision the infrastructure using Terraform
 - name: Provision infrastructure
   hosts: openstack
+  pre_tasks:
+    - name: Verify that OpenStack project ID is set
+      assert:
+        that: "openstack_project_id != ''"
+        msg: "openstack_project_id is not set"
   roles:
     - role: terraform_infra
       vars:
         # Variables controlling the Terraform provisioning
         terraform_project_path: "{{ playbook_dir }}/terraform"
         terraform_state: "{{ cluster_state | default('present') }}"
+        terraform_backend_config:
+          path: "{{ terraform_path_prefix }}cluster/{{ openstack_project_id }}/{{ cluster_name }}"
         terraform_variables:
           cluster_name: "{{ cluster_name }}"
           cluster_network: "{{ cluster_network }}"
@@ -29,7 +36,7 @@
         name: "{{ item }}"
         groups: openhpc_tests
       loop: "{{ groups['cluster'] }}"
-      when: "cluster_run_validation | default(False) | bool"
+      when: "cluster_run_validation | bool"
 
 # Ensure that the secrets are generated and persisted on the control host
 - name: Generate and persist secrets
