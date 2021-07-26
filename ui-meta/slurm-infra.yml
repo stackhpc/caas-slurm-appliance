@@ -46,11 +46,11 @@ parameters:
       min_disk: 10
 
   - name: cluster_run_validation
-    label: Run post-deploy cluster validation
-    description: |
-      If selected, post-deploy jobs will be executed to validate the functionality of the cluster.
-
-      These include MPI pingpong and pingmatrix jobs to ensure MPI connectivity of the nodes.
+    label: Post-deploy cluster validation
+    description: >-
+      If selected, post-deploy jobs will be executed to validate the core functionality
+      of the cluster.
     kind: boolean
+    required: false
     options:
       checkboxLabel: Run post-deploy validation?
