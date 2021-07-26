@@ -4,11 +4,6 @@
 - name: Provision infrastructure
   hosts: openstack
   pre_tasks:
-    - name: Verify that OpenStack project ID is set
-      assert:
-        that: "openstack_project_id != ''"
-        msg: "openstack_project_id is not set"
-
     # We need to convert the floating IP id to an address
     - name: Look up floating IP
       include_role:
@@ -22,8 +17,6 @@
         # Variables controlling the Terraform provisioning
         terraform_project_path: "{{ playbook_dir }}/terraform"
         terraform_state: "{{ cluster_state | default('present') }}"
-        terraform_backend_config:
-          path: "{{ terraform_path_prefix }}{{ cluster_id }}"
         terraform_variables:
           cluster_name: "{{ cluster_name }}"
           cluster_network: "{{ cluster_network }}"

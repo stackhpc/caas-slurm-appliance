@@ -11,6 +11,14 @@
     src: "{{ terraform_binary_url }}"
     dest: "{{ terraform_binary_directory }}"
 
+- name: Write backend configuration
+  copy:
+    content: |
+      terraform {
+        backend "{{ terraform_backend_type }}" { }
+      }
+    dest: "{{ terraform_project_path }}/backend.tf"
+
 - name: Provision infrastructure using Terraform
   terraform:
     binary_path: "{{ terraform_binary_path }}"

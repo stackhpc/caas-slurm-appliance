@@ -6,3 +6,4 @@
 .python-version
 inventory.*
 __pycache__
+terraform/backend.tf

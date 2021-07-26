@@ -1,17 +1,3 @@
-terraform {
-  required_version = ">= 0.14"
-
-  # We need the OpenStack provider
-  required_providers {
-    openstack = {
-      source = "terraform-provider-openstack/openstack"
-    }
-  }
-
-  # The Terraform state lives in Consul
-  backend "consul" { gzip = true }
-}
-
 #####
 ##### Security groups for the cluster
 #####

@@ -18,6 +18,20 @@ terraform_binary_directory: "{{ playbook_dir }}/.bin"
 # The path to the Terraform binary
 terraform_binary_path: "{{ terraform_binary_directory }}/terraform"
 
+# The Terraform backend type
+terraform_backend_type: local
+# Default backend configs for supported backend types
+# Any backend type can be used as long as all the required options are provided
+# via either the environment or the "terraform_backend_config" variable
+terraform_backend_config_defaults:
+  # No additional config required for the local backend
+  local: {}
+  # For Consul, set path and gzip but require connection into to come from the environment
+  consul:
+    path: "{{ terraform_state_key }}"
+    gzip: "true"
+# The backend configuration for the selected backend
+terraform_backend_config: "{{ terraform_backend_config_defaults[terraform_backend_type] | default({}) }}"
 
 # The SSH user defaults to centos
 cluster_ssh_user: centos
