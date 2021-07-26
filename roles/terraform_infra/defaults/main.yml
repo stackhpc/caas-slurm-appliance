@@ -1,6 +1,8 @@
+# Unpack the Terraform binary into this directory
+terraform_binary_directory: "{{ playbook_dir }}/.bin"
 # The path to the Terraform binary
 # By default, use the binary bundled with this role
-terraform_binary_path: "{{ role_path }}/bin/terraform"
+terraform_binary_path: "{{ terraform_binary_directory }}/terraform"
 
 # The Terraform backend type
 terraform_backend_type: local
