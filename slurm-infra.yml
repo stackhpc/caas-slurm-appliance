@@ -4,7 +4,12 @@
 - name: Provision infrastructure
   hosts: openstack
   pre_tasks:
-    # We need to convert the floating IP id to an address
+    - name: Install Python requirements
+      # Use the command module as making pip reliably install into the Ansible
+      # Python interpreter is not trivial
+      command: "{{ ansible_python_interpreter }} -m pip install -r {{ playbook_dir }}/requirements.txt"
+
+    # We need to convert the floating IP id to an address for Terraform
     - name: Look up floating IP
       include_role:
         name: terraform_infra

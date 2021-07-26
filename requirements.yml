@@ -1,0 +1,22 @@
+---
+roles:
+  - src: stackhpc.nfs
+  - src: stackhpc.openhpc
+  - src: cloudalchemy.node_exporter
+  - src: cloudalchemy.blackbox-exporter
+  - src: cloudalchemy.prometheus
+  - src: cloudalchemy.alertmanager
+  - src: cloudalchemy.grafana
+  - src: geerlingguy.mysql
+  - src: jriguera.configdrive
+
+collections:
+  - name: ansible.posix
+  - name: community.general
+  - name: community.grafana
+  - name: community.mysql
+  - name: containers.podman
+  - name: openstack.cloud
+  - name: https://github.com/stackhpc/ansible_collection_slurm_openstack_tools
+    type: git
+    version: main
