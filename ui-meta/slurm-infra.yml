@@ -1,0 +1,56 @@
+name: "slurm"
+label: "Slurm"
+description: Batch cluster running the Slurm workload manager.
+logo: https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Slurm_logo.svg/158px-Slurm_logo.svg.png
+
+parameters:
+  - name: cluster_floating_ip
+    label: External IP
+    description: The external IP to use for the login node.
+    kind: cloud.ip
+    immutable: true
+
+  - name: compute_count
+    label: Compute node count
+    description: The number of compute nodes in the cluster.
+    kind: integer
+    options:
+      min: 1
+    default: 3
+
+  - name: login_flavor
+    label: Login node size
+    description: The size to use for the login node.
+    kind: "cloud.size"
+    immutable: true
+    options:
+      min_ram: 2048
+      min_disk: 10
+
+  - name: control_flavor
+    label: Control node size
+    description: The size to use for the control node.
+    kind: "cloud.size"
+    immutable: true
+    options:
+      min_ram: 2048
+      min_disk: 10
+
+  - name: compute_flavor
+    label: Compute node size
+    description: The size to use for the compute node.
+    kind: "cloud.size"
+    immutable: true
+    options:
+      min_ram: 2048
+      min_disk: 10
+
+  - name: cluster_run_validation
+    label: Run post-deploy cluster validation
+    description: |
+      If selected, post-deploy jobs will be executed to validate the functionality of the cluster.
+
+      These include MPI pingpong and pingmatrix jobs to ensure MPI connectivity of the nodes.
+    kind: boolean
+    options:
+      checkboxLabel: Run post-deploy validation?

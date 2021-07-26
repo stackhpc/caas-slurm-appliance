@@ -28,7 +28,7 @@
           control_image: "{{ cluster_image }}"
           compute_image: "{{ cluster_image }}"
           login_flavor: "{{ login_flavor }}"
-          control_flavor: "{{ login_flavor }}"
+          control_flavor: "{{ control_flavor }}"
           compute_flavor: "{{ compute_flavor }}"
   # If cluster validation was requested, add the cluster hosts to the openhpc_tests group
   post_tasks:
@@ -65,6 +65,7 @@
 - name: Install Grafana
   hosts: grafana
   tags: grafana
+  gather_facts: no
   become: yes
   tasks:
     - name: Install Grafana from RPM
