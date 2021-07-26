@@ -23,7 +23,7 @@
         terraform_project_path: "{{ playbook_dir }}/terraform"
         terraform_state: "{{ cluster_state | default('present') }}"
         terraform_backend_config:
-          path: "{{ terraform_path_prefix }}cluster/{{ openstack_project_id }}/{{ cluster_name }}"
+          path: "{{ terraform_path_prefix }}{{ cluster_id }}"
         terraform_variables:
           cluster_name: "{{ cluster_name }}"
           cluster_network: "{{ cluster_network }}"
@@ -57,7 +57,12 @@
 # Use the playbooks invidually rather than the site playbook as it avoids the
 # need to define the environment variables referencing an environment
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/validate.yml
+
+# Apply updates as part of the bootstrap playbook if requested
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/bootstrap.yml
+  vars:
+    update_enable: "{{ cluster_upgrade_system_packages | default('false') | bool }}"
+
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/filesystems.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/slurm.yml
 
