@@ -5,9 +5,10 @@
     path: "{{ terraform_binary_directory }}"
     state: directory
 
-- name: Unpack Terraform binary
+- name: Download Terraform binary
   unarchive:
-    src: files/terraform.tar.gz
+    remote_src: yes
+    src: "{{ terraform_binary_url }}"
     dest: "{{ terraform_binary_directory }}"
 
 - name: Write backend configuration
