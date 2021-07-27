@@ -46,12 +46,8 @@
   become: yes
   pre_tasks:
     - debug: var=group_names
+    - debug: var=filebeat_config_path
   roles: [persist_openhpc_secrets]
-
-- hosts: openstack
-  tasks:
-    - pause:
-        minutes: 60
 
 # Configure the hosts as a Slurm cluster
 # Use the playbooks invidually rather than the site playbook as it avoids the
