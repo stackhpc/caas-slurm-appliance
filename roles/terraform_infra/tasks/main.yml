@@ -43,8 +43,8 @@
         # We can't just use ProxyJump here because we need agent forwarding, which is disabled even when
         # StrictHostKeyChecking=no in the case where a host key changes and the host is still in the
         # UserKnownHostsFile
-        # So we need to make sure that the UserKnownHostsFile is empty for the proxy command
-        cluster_ssh_common_args: "-o ProxyCommand='ssh -o UserKnownHostsFile=/dev/null -W %h:%p {{ cluster_gateway_user }}@{{ cluster_gateway_ip }}'"
+        # So we need to also make sure that the UserKnownHostsFile is empty for the proxy command
+        cluster_ssh_common_args: "-o ProxyCommand='ssh -i {{ cluster_ssh_private_key_file }} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -W %h:%p {{ cluster_gateway_user }}@{{ cluster_gateway_ip }}'"
 
     - name: Add cluster nodes to in-memory inventory
       add_host:
@@ -67,6 +67,7 @@
         ansible_connection: ssh
         ansible_host: "{{ node.ip }}"
         ansible_user: "{{ cluster_ssh_user }}"
+        ansible_ssh_private_key_file: "{{ cluster_ssh_private_key_file }}"
         ansible_ssh_common_args: "{{ cluster_ssh_common_args }}"
         ansible_python_interpreter: auto_legacy
       loop: "{{ cluster_nodes }}"
