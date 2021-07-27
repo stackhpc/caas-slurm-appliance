@@ -39,6 +39,9 @@
       loop: "{{ groups['cluster'] }}"
       when: "cluster_run_validation | bool"
 
+    - pause:
+        minutes: 60
+
 # Ensure that the secrets are generated and persisted on the control host
 - name: Generate and persist secrets
   hosts: control
