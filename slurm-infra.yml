@@ -44,10 +44,6 @@
   hosts: control
   gather_facts: no
   become: yes
-  pre_tasks:
-    - debug: var=group_names
-    - debug: var=filebeat_config_path
-    - debug: var=hostvars[inventory_hostname]
   roles: [persist_openhpc_secrets]
 
 # Configure the hosts as a Slurm cluster
