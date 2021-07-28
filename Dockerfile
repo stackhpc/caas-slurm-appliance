@@ -1,3 +1,12 @@
+#####
+# Dockerfile for the CaaS Slurm Appliance Ansible Execution Environment
+#
+# This is primarily for use with AWX but can also be used with ansible-runner standalone
+#
+# It was *mostly* generated using ansible-builder, but with the ADD/COPY statements
+# modified to use the files in place
+#####
+
 ARG EE_BASE_IMAGE=quay.io/ansible/ansible-runner:latest
 ARG EE_BUILDER_IMAGE=quay.io/ansible/ansible-builder:latest
 

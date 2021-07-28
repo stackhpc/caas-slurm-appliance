@@ -3,6 +3,8 @@
 # Provision the infrastructure using Terraform
 - name: Provision infrastructure
   hosts: openstack
+  vars_files:
+    - vars/openstack.yml
   pre_tasks:
     # We need to convert the floating IP id to an address for Terraform
     - name: Look up floating IP
@@ -39,6 +41,35 @@
       loop: "{{ groups['cluster'] }}"
       when: "cluster_run_validation | bool"
 
+# Ensure any variables required for the Slurm appliance playbooks are set on the cluster hosts
+#
+# We can't use group_vars for this because group_vars are only loaded from two directories:
+#
+#   1. The directory containing the currently executing playbook
+#   2. The directory containing the inventory
+#
+# This means that when we use import_playbook, the group_vars in the directory containing this
+# playbook are no longer in scope, so we need to make sure that they are added to the hostvars
+# for the individual hosts
+#
+# This is further complicated by the use of environments in the Slurm appliance, which means
+# that the group_vars for the common inventory are also not in scope of the appliance playbooks
+# and we must import them manually as well
+- name: Set variables for Slurm appliance
+  hosts: cluster
+  tasks:
+    - name: Include variables from common inventory
+      include_vars:
+        dir: vendor/stackhpc/ansible-slurm-appliance/environments/common/inventory/group_vars/all
+
+    - name: Include overrides for host groups
+      include_vars: "{{ lookup('first_found', lookup_params) }}"
+      vars:
+        lookup_params:
+          files: ["{{ item }}.yml", empty.yml]
+          paths: [vars]
+      loop: "{{ group_names }}"
+
 # Ensure that the secrets are generated and persisted on the control host
 - name: Generate and persist secrets
   hosts: control
@@ -50,12 +81,7 @@
 # Use the playbooks invidually rather than the site playbook as it avoids the
 # need to define the environment variables referencing an environment
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/validate.yml
-
-# Apply updates as part of the bootstrap playbook if requested
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/bootstrap.yml
-  vars:
-    update_enable: "{{ cluster_upgrade_system_packages | default('false') | bool }}"
-
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/filesystems.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/slurm.yml
 

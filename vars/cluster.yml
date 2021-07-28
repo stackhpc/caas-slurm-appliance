@@ -1,4 +1,7 @@
-# Read the variables from the Ansible local facts on the control host
+# Convert the variable supplied by the portal into the one expected by the Slurm appliance
+update_enable: "{{ cluster_upgrade_system_packages | default('false') | bool }}"
+
+# Read the secrets from the Ansible local facts on the control host
 secrets_openhpc_grafana_admin_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.grafana_admin_password }}"
 secrets_openhpc_elasticsearch_admin_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.elasticsearch_admin_password }}"
 secrets_openhpc_elasticsearch_kibana_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.elasticsearch_kibana_password }}"
