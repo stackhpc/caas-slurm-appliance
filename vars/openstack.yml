@@ -1,4 +1,0 @@
-# The default Terraform state key for backends that support it
-terraform_state_key: "cluster/{{ cluster_id }}/tfstate"
-# By default, don't run the cluster validation
-cluster_run_validation: no

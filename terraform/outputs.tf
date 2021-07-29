@@ -27,35 +27,3 @@ output "cluster_nodes" {
     ]
   )
 }
-
-#####
-## WARNING
-##
-## The groups specified here should replicate the groups in the StackHPC Slurm appliance environments
-##
-## https://github.com/stackhpc/ansible-slurm-appliance/blob/main/environments/common/inventory/groups
-## https://github.com/stackhpc/ansible-slurm-appliance/blob/main/environments/common/layouts/everything
-#####
-output "cluster_groups" {
-  description = "A mapping of groups to their child groups"
-  value = {
-    "login"         = ["${var.cluster_name}_login"]
-    "control"       = ["${var.cluster_name}_control"]
-    "compute"       = ["${var.cluster_name}_compute"]
-    "openhpc"       = ["login", "control", "compute"]
-    "cluster"       = ["openhpc"]
-    "selinux"       = ["cluster"]
-    "podman"        = ["opendistro", "kibana", "filebeat"]
-    "nfs"           = ["openhpc"]
-    "mysql"         = ["control"]
-    "prometheus"    = ["control"]
-    "grafana"       = ["control"]
-    "alertmanager"  = ["control"]
-    "node_exporter" = ["cluster"]
-    "opendistro"    = ["control"]
-    "kibana"        = ["control"]
-    "slurm_stats"   = ["control"]
-    "filebeat"      = ["slurm_stats"]
-    "update"        = ["cluster"]
-  }
-}

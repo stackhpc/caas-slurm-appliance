@@ -45,12 +45,23 @@ parameters:
       min_ram: 2048
       min_disk: 10
 
-  - name: cluster_run_validation
-    label: Post-deploy cluster validation
-    description: >-
-      If selected, post-deploy jobs will be executed to validate the core functionality
-      of the cluster.
+  - name: cluster_monitoring_enabled
+    label: Cluster monitoring
+    description: |
+      If selected, a monitoring stack will be deployed allowing you to track and visualise the
+      state of the cluster.  
+      WARNING: This can take a significant amount of time to deploy and configure.
     kind: boolean
     required: false
     options:
-      checkboxLabel: Run post-deploy validation?
+      checkboxLabel: Enable cluster monitoring?
+
+  - name: cluster_run_validation
+    label: Post-configuration validation
+    description: >-
+      If selected, post-configuration jobs will be executed to validate the core functionality
+      of the cluster when it is re-configured.
+    kind: boolean
+    required: false
+    options:
+      checkboxLabel: Run post-configuration validation?
