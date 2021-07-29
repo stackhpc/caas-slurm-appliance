@@ -1,9 +1,5 @@
 ---
 
-- hosts: all
-  tasks:
-    - debug: var=ansible_env.PWD
-
 # Provision the infrastructure using Terraform
 - name: Provision infrastructure
   hosts: openstack
