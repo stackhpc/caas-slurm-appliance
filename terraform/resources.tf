@@ -53,8 +53,8 @@ resource "openstack_compute_instance_v2" "login" {
     name = var.cluster_network
   }
   security_groups = [
-    openstack_networking_secgroup_v2.secgroup_slurm_cluster.name,
-    openstack_networking_secgroup_v2.secgroup_slurm_login.name
+    openstack_networking_secgroup_v2.secgroup_slurm_cluster.name #,
+    #openstack_networking_secgroup_v2.secgroup_slurm_login.name
   ]
   # Use cloud-init to inject the SSH keys
   user_data = <<-EOF
