@@ -1,0 +1,2 @@
+# Make sure we use the IP address
+nfs_server_default: "{{ hostvars[groups['control'] | first].default_ipv4.address }}"

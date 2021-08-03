@@ -59,7 +59,6 @@ resource "openstack_compute_instance_v2" "login" {
   # Use cloud-init to inject the SSH keys
   user_data = <<-EOF
     #cloud-config
-
     ssh_authorized_keys:
       %{ for key in var.cluster_ssh_public_keys }
       - ${key}
@@ -78,7 +77,6 @@ resource "openstack_compute_instance_v2" "control" {
   # Use cloud-init to inject the SSH keys
   user_data = <<-EOF
     #cloud-config
-
     ssh_authorized_keys:
       %{ for key in var.cluster_ssh_public_keys }
       - ${key}
@@ -99,7 +97,6 @@ resource "openstack_compute_instance_v2" "compute" {
   # Use cloud-init to inject the SSH keys
   user_data = <<-EOF
     #cloud-config
-
     ssh_authorized_keys:
       %{ for key in var.cluster_ssh_public_keys }
       - ${key}
