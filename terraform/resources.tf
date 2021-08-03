@@ -27,7 +27,7 @@ resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_cluster_rule_eg
 resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_cluster_rule_ingress_internal_v4" {
   direction         = "ingress"
   ethertype         = "IPv4"
-  remote_group_id   = openstack_networking_secgroup_v2.secgroup_slurm_cluster.id
+#  remote_group_id   = openstack_networking_secgroup_v2.secgroup_slurm_cluster.id
   security_group_id = openstack_networking_secgroup_v2.secgroup_slurm_cluster.id
 }
 
