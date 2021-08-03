@@ -65,7 +65,31 @@
 # Use the playbooks invidually rather than the site playbook as it avoids the
 # need to define the environment variables referencing an environment
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/validate.yml
+
+# The first task in the bootstrap playbook causes the home directory of the centos user to be moved
+# on the first run
+# This can disrupt the SSH connection, particularly because we use the login host as a jump host
+# So we move the home directory on the login node and reset the connection first
+- name: Set up Ansible user on login nodes
+  hosts: login
+  gather_facts: false
+  tasks:
+    - name: Set up Ansible user
+      ansible.builtin.user: "{{ appliances_local_users_ansible_user }}"
+      become_method: "sudo"
+      # Need to change working directory otherwise we try to switch back to non-existent directory.
+      become_flags: '-i'
+      become: true
+
+- name: Reset persistent SSH connections
+  hosts: cluster
+  gather_facts: no
+  tasks:
+    - name: Reset persistent SSH connection
+      meta: reset_connection
+
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/bootstrap.yml
+
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/filesystems.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/slurm.yml
 
