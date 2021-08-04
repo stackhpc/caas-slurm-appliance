@@ -54,15 +54,15 @@
       loop: "{{ groups.get('cluster', []) }}"
       when: cluster_run_validation | default(false) | bool
 
-# Ensure that the hosts in the cluster can all refer to each other by their inventory hostname
+# Ensure that the hosts in the cluster can all refer to each other by their hostname
 - hosts: cluster
   become: yes
   tasks:
     - name: Populate /etc/hosts with cluster hosts
       lineinfile:
         path: /etc/hosts
-        regexp: "{{ hostvars[host].ansible_hostname }}"
-        line: "{{ hostvars[host].ansible_default_ipv4.address }} {{ hostvars[host].ansible_fqdn }} {{ hostvars[host].ansible_hostname }}"
+        regexp: "{{ hostvars[host].inventory_hostname }}"
+        line: "{{ hostvars[host].ansible_default_ipv4.address }} {{ hostvars[host].inventory_hostname }}"
       loop: "{{ ansible_play_hosts }}"
       loop_control:
         loop_var: host
