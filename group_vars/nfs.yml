@@ -1,0 +1,2 @@
+# Use the IP address instead
+nfs_server_default: "{{ hostvars[groups['control'] | first ].ansible_default_ipv4.address }}"
