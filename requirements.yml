@@ -9,6 +9,10 @@ roles:
   - src: cloudalchemy.grafana
   - src: geerlingguy.mysql
   - src: jriguera.configdrive
+  - name: stackhpc.terraform-infra
+    src: https://github.com/stackhpc/ansible-role-terraform-infra
+    type: git
+    version: main
 
 collections:
   - name: ansible.posix

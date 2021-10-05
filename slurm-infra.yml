@@ -7,12 +7,12 @@
     # We need to convert the floating IP id to an address for Terraform
     - name: Look up floating IP
       include_role:
-        name: terraform_infra
+        name: stackhpc.terraform-infra
         tasks_from: lookup_floating_ip
       vars:
         os_floating_ip_id: "{{ cluster_floating_ip }}"
   roles:
-    - role: terraform_infra
+    - role: stackhpc.terraform-infra
       vars:
         # Variables controlling the Terraform provisioning
         terraform_project_path: "{{ playbook_dir }}/terraform"

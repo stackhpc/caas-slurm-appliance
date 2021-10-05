@@ -1,3 +1,0 @@
-collections:
-  # The terraform module is in the community.general collection
-  - community.general
