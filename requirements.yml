@@ -12,7 +12,7 @@ roles:
   - name: stackhpc.terraform-infra
     src: https://github.com/stackhpc/ansible-role-terraform-infra
     type: git
-    version: main
+    version: b750fd38be4eedf111eff0ed8833295efe3b6422
 
 collections:
   - name: ansible.posix
