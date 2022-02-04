@@ -1,10 +1,19 @@
 ---
 roles:
   - src: stackhpc.nfs
-  - src: stackhpc.openhpc
-  - src: cloudalchemy.node_exporter
+  - name: stackhpc.openhpc
+    src: https://github.com/stackhpc/ansible-role-openhpc
+    type: git
+    version: v0.10.0
+  #- src: cloudalchemy.node_exporter
+  - src: https://github.com/stackhpc/ansible-node-exporter.git
+    name: cloudalchemy.node_exporter
+    version: support-rhel-clones # Fixes for Rocky
   - src: cloudalchemy.blackbox-exporter
-  - src: cloudalchemy.prometheus
+  #- src: cloudalchemy.prometheus
+  - src: https://github.com/cloudalchemy/ansible-prometheus.git
+    name: cloudalchemy.prometheus
+    version: 0795bdb1a5a424044dc7e8200129f61e53140523 # Fixes for Rocky
   - src: cloudalchemy.alertmanager
   - src: cloudalchemy.grafana
   - src: geerlingguy.mysql
@@ -12,10 +21,11 @@ roles:
   - name: stackhpc.terraform-infra
     src: https://github.com/stackhpc/ansible-role-terraform-infra
     type: git
-    version: b750fd38be4eedf111eff0ed8833295efe3b6422
+    version: 4d9d67b5a1866edf6988a1f7e9e64868df8f65ae
 
 collections:
   - name: ansible.posix
+  - name: ansible.netcommon
   - name: community.general
   - name: community.grafana
   - name: community.mysql
@@ -23,4 +33,4 @@ collections:
   - name: openstack.cloud
   - name: https://github.com/stackhpc/ansible_collection_slurm_openstack_tools
     type: git
-    version: main
+    version: v0.1.0

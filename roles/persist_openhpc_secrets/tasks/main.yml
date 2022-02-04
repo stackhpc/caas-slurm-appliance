@@ -17,4 +17,8 @@
       template:
         src: openhpc_secrets.fact
         dest: /etc/ansible/facts.d/openhpc_secrets.fact
+
+    - name: Re-read facts after adding custom fact
+      ansible.builtin.setup:
+        filter: ansible_local
   when: "not openhpc_secrets_stat.stat.exists"

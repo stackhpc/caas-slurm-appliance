@@ -2,12 +2,12 @@
 update_enable: "{{ cluster_upgrade_system_packages | default('false') | bool }}"
 
 # Read the secrets from the Ansible local facts on the control host
-secrets_openhpc_grafana_admin_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.grafana_admin_password }}"
-secrets_openhpc_elasticsearch_admin_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.elasticsearch_admin_password }}"
-secrets_openhpc_elasticsearch_kibana_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.elasticsearch_kibana_password }}"
-secrets_openhpc_mysql_root_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.mysql_root_password }}"
-secrets_openhpc_mysql_slurm_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.mysql_slurm_password }}"
-secrets_openhpc_mungekey: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.mungekey }}"
+vault_grafana_admin_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_grafana_admin_password }}"
+vault_elasticsearch_admin_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_elasticsearch_admin_password }}"
+vault_elasticsearch_kibana_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_elasticsearch_kibana_password }}"
+vault_mysql_root_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_mysql_root_password }}"
+vault_mysql_slurm_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_mysql_slurm_password }}"
+vault_openhpc_mungekey: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_openhpc_mungekey }}"
 
 # Override this to cope with the case where the podman group just doesn't exist
 appliances_local_users_podman_enable: "{{ groups.get('podman', []) | length > 0 }}"

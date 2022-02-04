@@ -1,6 +1,12 @@
 # The default Terraform state key for backends that support it
 terraform_state_key: "cluster/{{ cluster_id }}/tfstate"
 
+terraform_backend_config_defaults:
+  consul:
+    path: "{{ terraform_state_key }}"
+    gzip: "true"
+  local: {}
+
 #####
 ## WARNING
 ##
@@ -24,16 +30,15 @@ cluster_groups_required:
 
 # These are the additional groups required for monitoring (see everything layout)
 cluster_groups_monitoring:
-  podman:        [opendistro, kibana, filebeat]
+  podman:        [opendistro, filebeat]
   prometheus:    [control]
   grafana:       [control]
   alertmanager:  [control]
   node_exporter: [cluster]
   opendistro:    [control]
-  kibana:        [control]
   slurm_stats:   [control]
   filebeat:      [slurm_stats]
 
 # Additional groups for running the cluster validation
 cluster_groups_validation:
-  openhpc_tests: [cluster]
+  hpctests: [login]
