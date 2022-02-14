@@ -27,6 +27,9 @@ cluster_groups_required:
   nfs:           [cluster]
   mysql:         [control]
   update:        [cluster]
+  openondemand:  [login]
+  openondemand_desktop: [compute]
+  openondemand_jupyter: [compute]
 
 # These are the additional groups required for monitoring (see everything layout)
 cluster_groups_monitoring:

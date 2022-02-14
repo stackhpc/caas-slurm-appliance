@@ -22,6 +22,9 @@ roles:
     src: https://github.com/stackhpc/ansible-role-terraform-infra
     type: git
     version: 4d9d67b5a1866edf6988a1f7e9e64868df8f65ae
+  - src: https://github.com/stackhpc/ood-ansible.git
+    name: osc.ood
+    version: feature/Rocky
 
 collections:
   - name: ansible.posix

@@ -111,5 +111,6 @@
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/bootstrap.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/filesystems.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/slurm.yml
+- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/portal.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/monitoring.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/adhoc/hpctests.yml
