@@ -65,3 +65,9 @@ parameters:
     required: false
     options:
       checkboxLabel: Run post-configuration validation?
+
+services:
+  - name: monitoring
+    label: Monitoring
+    icon_url: https://raw.githubusercontent.com/cncf/artwork/master/projects/prometheus/icon/color/prometheus-icon-color.png
+    when: cluster_monitoring_enabled
