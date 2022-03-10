@@ -52,7 +52,6 @@ parameters:
       state of the cluster.  
       WARNING: This can take a significant amount of time to deploy and configure.
     kind: boolean
-    required: false
     default: true
     options:
       checkboxLabel: Enable cluster monitoring?
@@ -63,7 +62,6 @@ parameters:
       If selected, post-configuration jobs will be executed to validate the core functionality
       of the cluster when it is re-configured.
     kind: boolean
-    required: false
     default: true
     options:
       checkboxLabel: Run post-configuration validation?
