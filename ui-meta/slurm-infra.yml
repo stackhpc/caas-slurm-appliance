@@ -53,7 +53,7 @@ parameters:
       WARNING: This can take a significant amount of time to deploy and configure.
     kind: boolean
     required: false
-    default: false
+    default: true
     options:
       checkboxLabel: Enable cluster monitoring?
 
@@ -64,7 +64,7 @@ parameters:
       of the cluster when it is re-configured.
     kind: boolean
     required: false
-    default: false
+    default: true
     options:
       checkboxLabel: Run post-configuration validation?
 
