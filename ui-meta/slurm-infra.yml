@@ -53,6 +53,7 @@ parameters:
       WARNING: This can take a significant amount of time to deploy and configure.
     kind: boolean
     required: false
+    default: false
     options:
       checkboxLabel: Enable cluster monitoring?
 
@@ -63,8 +64,16 @@ parameters:
       of the cluster when it is re-configured.
     kind: boolean
     required: false
+    default: false
     options:
       checkboxLabel: Run post-configuration validation?
+
+usage_template: |
+  Access to the cluster is via the external IP using SSH as the `rocky` user:
+
+  ```
+  ssh rocky@{{ cluster_floating_ip }}
+  ```
 
 services:
   - name: monitoring
