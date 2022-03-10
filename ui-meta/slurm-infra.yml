@@ -78,6 +78,10 @@ usage_template: |-
   compute*     up 60-00:00:0      {{ cluster.parameter_values.compute_count }}   idle {{ cluster.name }}-compute-[0-{{ cluster.parameter_values.compute_count - 1 }}]
   ```
 
+  The SSH public key of the user that deployed the cluster is injected.
+
+  Access can be granted to additional users by placing their SSH public key in `~rocky/.ssh/authorized_keys`.
+
 services:
   - name: monitoring
     label: Monitoring
