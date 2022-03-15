@@ -130,7 +130,19 @@
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/filesystems.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/slurm.yml
 
-# Deploy the monitoring stack first
+- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/iam.yml
+# Add the azimuth user SSH key
+- hosts: cluster
+  gather_facts: false
+  tasks:
+    - name: Add Azimuth user SSH key
+      ansible.posix.authorized_key:
+        user: "{{ basic_users_users[0].name }}"
+        state: present
+        key: "{{ cluster_user_ssh_public_key }}"
+      become: true
+
+# Deploy the monitoring stack
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/monitoring.yml
 
 # Configure the Zenith clients that are required
