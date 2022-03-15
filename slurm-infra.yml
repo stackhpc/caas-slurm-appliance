@@ -52,20 +52,25 @@
     - name: Add cluster hosts to required groups
       add_host:
         name: "{{ item }}"
-        groups: "{{ hostvars[item].group_names | terraform_infra_expand_groups(cluster_groups_required) }}"
+        groups: "{{ hostvars[item].group_names | stackhpc.terraform.terraform_infra_expand_groups(cluster_groups_required) }}"
       loop: "{{ groups.get('cluster', []) }}"
-    # If monitoring was requested, add the monitoring groups to hosts
+    # Add hosts to the OOD groups
+    - name: Add cluster hosts to OOD groups
+      add_host:
+        name: "{{ item }}"
+        groups: "{{ hostvars[item].group_names | stackhpc.terraform.terraform_infra_expand_groups(cluster_groups_ood) }}"
+      loop: "{{ groups.get('cluster', []) }}"
+    # Add hosts to the monitoring groups
     - name: Add cluster hosts to monitoring groups
       add_host:
         name: "{{ item }}"
-        groups: "{{ hostvars[item].group_names | terraform_infra_expand_groups(cluster_groups_monitoring) }}"
+        groups: "{{ hostvars[item].group_names | stackhpc.terraform.terraform_infra_expand_groups(cluster_groups_monitoring) }}"
       loop: "{{ groups.get('cluster', []) }}"
-      when: cluster_monitoring_enabled | default(false) | bool
     # If validation was requested, add the validation groups to hosts
     - name: Add cluster hosts to validation groups
       add_host:
         name: "{{ item }}"
-        groups: "{{ hostvars[item].group_names | terraform_infra_expand_groups(cluster_groups_validation) }}"
+        groups: "{{ hostvars[item].group_names | stackhpc.terraform.terraform_infra_expand_groups(cluster_groups_validation) }}"
       loop: "{{ groups.get('cluster', []) }}"
       when: cluster_run_validation | default(false) | bool
     # If Zenith is enabled, add the zenith groups to hosts
@@ -76,10 +81,11 @@
       loop: "{{ groups.get('cluster', []) }}"
       when: zenith_subdomain_monitoring is defined
 
-# Ensure that the hosts in the cluster can all refer to each other by their hostname
+# Setup tasks now that all hosts have been added to the correct groups
 - hosts: cluster
   become: yes
   tasks:
+    # Ensure that the hosts in the cluster can all refer to each other by their hostname
     - name: Populate /etc/hosts with cluster hosts
       lineinfile:
         path: /etc/hosts
@@ -129,8 +135,9 @@
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/bootstrap.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/filesystems.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/slurm.yml
-
+- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/portal.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/iam.yml
+
 # Add the azimuth user SSH key
 - hosts: cluster
   gather_facts: false
