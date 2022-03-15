@@ -7,6 +7,10 @@ terraform_backend_config_defaults:
     gzip: "true"
   local: {}
 
+terraform_binary_directory: "{{ playbook_dir }}/bin"
+terraform_binary_path: "{{ terraform_binary_directory }}/terraform"
+terraform_project_path: "{{ playbook_dir }}/terraform"
+
 #####
 ## WARNING
 ##

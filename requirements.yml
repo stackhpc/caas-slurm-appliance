@@ -33,6 +33,9 @@ collections:
   - name: community.mysql
   - name: containers.podman
   - name: openstack.cloud
+  - name: https://github.com/stackhpc/ansible-collection-terraform
+    type: git
+    version: e7243ff5ccb6186ea2fa6e108e5a2b5f408e59c0
   - name: https://github.com/stackhpc/ansible_collection_slurm_openstack_tools
     type: git
     version: v0.1.0

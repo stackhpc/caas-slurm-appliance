@@ -3,38 +3,48 @@
 # Provision the infrastructure using Terraform
 - name: Provision infrastructure
   hosts: openstack
+  collections:
+    - stackhpc.terraform
   pre_tasks:
     # We need to convert the floating IP id to an address for Terraform
     - name: Look up floating IP
       include_role:
-        name: stackhpc.terraform-infra
+        name: stackhpc.terraform.infra
         tasks_from: lookup_floating_ip
       vars:
         os_floating_ip_id: "{{ cluster_floating_ip }}"
+
+    - name: Make Terraform project directory
+      file:
+        path: "{{ terraform_project_path }}"
+        state: directory
+
+    - name: Template Terraform files into project directory
+      template:
+        src: "{{ item }}.j2"
+        dest: "{{ terraform_project_path }}/{{ item }}"
+      loop:
+        - outputs.tf
+        - providers.tf
+        - resources.tf
+      vars:
+        cluster_floating_ip: "{{ os_floating_ip_info.floating_ip_address }}"
+        # We need to inject the user's SSH key and the deploy key for the cluster
+        cluster_ssh_public_keys: "{{ [cluster_deploy_ssh_public_key, cluster_user_ssh_public_key] }}"
+        cluster_partition_name: "{{ openhpc_slurm_partitions[0].name }}"
+
   roles:
-    - role: stackhpc.terraform-infra
+    - role: stackhpc.terraform.install
+    - role: stackhpc.terraform.infra
       vars:
         # Image cloud user, use extraVars.__ALL__.cluster_user in values.yaml
         # to change if required
         cluster_ssh_user: "{{ cluster_user | default('rocky') }}"
         # Variables controlling the Terraform provisioning
-        terraform_project_path: "{{ playbook_dir }}/terraform"
         terraform_state: "{{ cluster_state | default('present') }}"
         terraform_backend_type: "{{ ( 'CONSUL_HTTP_ADDR' in ansible_env ) | ternary('consul', 'local') }}"
         terraform_backend_config: "{{ terraform_backend_config_defaults[terraform_backend_type] }}"
-        terraform_variables:
-          cluster_name: "{{ cluster_name }}"
-          cluster_network: "{{ cluster_network }}"
-          cluster_floating_ip: "{{ os_floating_ip_info.floating_ip_address }}"
-          # We need to inject the user's SSH key and the deploy key for the cluster
-          cluster_ssh_public_keys: "{{ [cluster_deploy_ssh_public_key, cluster_user_ssh_public_key] | to_json }}"
-          compute_count: "{{ compute_count }}"
-          login_image: "{{ cluster_image }}"
-          control_image: "{{ cluster_image }}"
-          compute_image: "{{ cluster_image }}"
-          login_flavor: "{{ login_flavor }}"
-          control_flavor: "{{ control_flavor }}"
-          compute_flavor: "{{ compute_flavor }}"
+
   # The hosts provisioned by Terraform are put into a primary group by the role
   # These tasks then add those hosts to additional groups depending on the selected options
   post_tasks:
