@@ -4,3 +4,9 @@ zenith_proxy_podman_user: podman
 
 grafana_address: "{{ ansible_default_ipv4.address }}"
 grafana_port: 3000
+
+# Override when there's no OOD
+grafana_serve_from_sub_path: "{{ 'openondemand' in groups }}"
+grafana_auth_anonymous: "{{ 'openondemand' in groups }}"
+
+grafana_url: "{{ grafana_url_openondemand_proxy if 'openondemand' in groups else grafana_url_direct }}"
