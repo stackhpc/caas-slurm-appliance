@@ -27,7 +27,9 @@
           cluster_network: "{{ cluster_network }}"
           cluster_floating_ip: "{{ os_floating_ip_info.floating_ip_address }}"
           # We need to inject the user's SSH key and the deploy key for the cluster
-          cluster_ssh_public_keys: "[]"
+          cluster_ssh_public_keys:
+            - "{{ cluster_deploy_ssh_public_key }}"
+            - "{{ cluster_user_ssh_public_key }}"
           compute_count: "{{ compute_count }}"
           login_image: "{{ cluster_image }}"
           control_image: "{{ cluster_image }}"
