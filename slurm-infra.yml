@@ -58,6 +58,13 @@
         groups: "{{ hostvars[item].group_names | terraform_infra_expand_groups(cluster_groups_validation) }}"
       loop: "{{ groups.get('cluster', []) }}"
       when: cluster_run_validation | default(false) | bool
+    # If Zenith is enabled, add the zenith groups to hosts
+    - name: Add clusters hosts to Zenith groups
+      add_host:
+        name: "{{ item }}"
+        groups: "{{ hostvars[item].group_names | terraform_infra_expand_groups(cluster_groups_zenith) }}"
+      loop: "{{ groups.get('cluster', []) }}"
+      when: zenith_subdomain_monitoring is defined
 
 # Ensure that the hosts in the cluster can all refer to each other by their hostname
 - hosts: cluster
@@ -115,8 +122,10 @@
 
 # Deploy the monitoring stack first
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/monitoring.yml
-# Ensure that podman is installed on the host running grafana
-- hosts: grafana,!podman
+
+# Configure the Zenith clients that are required
+# First, ensure that podman is installed on all hosts that will run Zenith clients
+- hosts: zenith,!podman
   tasks:
     - import_role:
         name: podman
@@ -124,7 +133,7 @@
     - import_role:
         name: podman
         tasks_from: config.yml
-# Then deploy the Zenith client onto the Grafana hosts to talk to it
+# Deploy the Zenith client for Grafana
 - hosts: grafana
   tasks:
     - include_role:

@@ -47,5 +47,3 @@ cluster_groups_validation:
 cluster_groups_zenith:
   # Any hosts in the grafana group should go in the zenith group
   zenith: [grafana]
-  # Any hosts in the zenith group should have podman installed
-  podman: [zenith]
