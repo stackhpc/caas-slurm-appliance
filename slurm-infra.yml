@@ -101,7 +101,6 @@
         openondemand_servername: "{{ hostvars[groups['openstack'][0]].os_floating_ip_info.floating_ip_address | replace('.', '-') ~ '.sslip.io' }}"
       delegate_to: "{{ item }}"
       loop: "{{ groups['openondemand'] + ( groups['grafana'] if 'grafana' in groups else [] ) | unique }}"
-      when: cluster_ood_enabled | default(false) | bool
 
 # Ensure that the secrets are generated and persisted on the control host
 - name: Generate and persist secrets

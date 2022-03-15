@@ -41,7 +41,6 @@ resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_ingr
   security_group_id = "${openstack_networking_secgroup_v2.secgroup_slurm_login.id}"
 }
 
-{% if cluster_ood_enabled %}
 ## Allow ingress on port 443 (HTTPS) from anywhere for the login nodes
 resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_ingress_https_v4" {
   direction = "ingress"
@@ -61,7 +60,6 @@ resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_ingr
   port_range_max    = 80
   security_group_id = "${openstack_networking_secgroup_v2.secgroup_slurm_login.id}"
 }
-{% endif %}
 
 #####
 ##### Cluster nodes
