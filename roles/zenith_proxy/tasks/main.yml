@@ -1,0 +1,67 @@
+---
+
+- name: Collect usernamespace facts
+  user_namespace_facts:
+
+- name: Set facts containing sub-ids
+  set_fact:
+    # podman user is 1000
+    zenith_proxy_host_user_id: "{{ ansible_facts.subuid[zenith_proxy_podman_user]['start'] + 1000 - 1 }}"
+    zenith_proxy_host_group_id: "{{ ansible_facts.subgid[zenith_proxy_podman_user]['start'] + 1000 - 1 }}"
+
+- block:
+    - name: Create systemd unit file for MITM proxy
+      template:
+        src: mitm.service.j2
+        dest: /etc/systemd/system/{{ zenith_proxy_mitm_service_name }}.service
+      register: zenith_proxy_mitm_systemd_unit
+
+    - name: Ensure MITM proxy is started and enabled
+      service:
+        name: "{{ zenith_proxy_mitm_service_name }}.service"
+        state: "{{ 'restarted' if zenith_proxy_mitm_systemd_unit is changed else 'started' }}"
+        enabled: yes
+        daemon_reload: "{{ zenith_proxy_mitm_systemd_unit is changed }}"
+  become: true
+  when: zenith_proxy_mitm_enabled
+
+- name: Ensure Zenith config directory exists
+  file:
+    path: /etc/zenith/{{ zenith_proxy_service_name }}
+    state: directory
+
+- name: Write Zenith client configuration
+  template:
+    src: zenith-client.yaml.j2
+    dest: /etc/zenith/{{ zenith_proxy_service_name }}/client.yaml
+
+- name: Create podman volume to persist SSH key
+  containers.podman.podman_volume:
+    name: "{{ zenith_proxy_service_name }}-ssh"
+  become: yes
+  become_user: "{{ zenith_proxy_podman_user }}"
+
+- name: Initialise Zenith client
+  containers.podman.podman_container:
+    name: "{{ zenith_proxy_service_name }}-init"
+    image: "{{ zenith_proxy_client_image }}"
+    command: [zenith-client, init]
+    detach: no
+    volumes:
+      - /etc/zenith/{{ zenith_proxy_service_name }}:/etc/zenith:ro
+      - "{{ zenith_proxy_service_name }}-ssh:/home/zenith/.ssh"
+  become: yes
+  become_user: "{{ zenith_proxy_podman_user }}"
+
+- name: Create systemd unit file for Zenith client
+  template:
+    src: client.service.j2
+    dest: /etc/systemd/system/{{ zenith_proxy_service_name }}.service
+  register: zenith_proxy_client_systemd_unit
+
+- name: Ensure Zenith client is started and enabled
+  service:
+    name: "{{ zenith_proxy_service_name }}.service"
+    state: "{{ 'restarted' if zenith_proxy_client_systemd_unit is changed else 'started' }}"
+    enabled: yes
+    daemon_reload: "{{ zenith_proxy_client_systemd_unit is changed }}"
