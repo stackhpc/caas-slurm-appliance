@@ -1,6 +1,8 @@
 name: "slurm"
 label: "Slurm"
-description: Batch cluster running the Slurm workload manager.
+description: >- 
+  Batch cluster running the Slurm workload manager, the Open 
+  OnDemand web interface, and custom monitoring.
 logo: https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Slurm_logo.svg/158px-Slurm_logo.svg.png
 
 parameters:
