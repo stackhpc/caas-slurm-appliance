@@ -49,11 +49,13 @@
     image: "{{ zenith_proxy_client_image }}"
     command: [zenith-client, init]
     detach: no
+    tty: yes
     volumes:
       - /etc/zenith/{{ zenith_proxy_service_name }}:/etc/zenith:ro
       - "{{ zenith_proxy_service_name }}-ssh:/home/zenith/.ssh"
   become: true
   become_user: "{{ zenith_proxy_podman_user }}"
+  register: zenith_proxy_client_init
 
 - name: Create systemd unit file for Zenith client
   template:
@@ -65,7 +67,15 @@
 - name: Ensure Zenith client is started and enabled
   service:
     name: "{{ zenith_proxy_service_name }}.service"
-    state: "{{ 'restarted' if zenith_proxy_client_systemd_unit is changed else 'started' }}"
+    state: >-
+      {{
+        'restarted'
+        if (
+            zenith_proxy_client_systemd_unit is changed or
+            zenith_proxy_client_init is changed
+        )
+        else 'started'
+      }}
     enabled: yes
     daemon_reload: "{{ zenith_proxy_client_systemd_unit is changed }}"
   become: true

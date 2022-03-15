@@ -42,3 +42,10 @@ cluster_groups_monitoring:
 # Additional groups for running the cluster validation
 cluster_groups_validation:
   hpctests: [login]
+
+# Additional groups for Zenith support
+cluster_groups_zenith:
+  # Any hosts in the grafana group should go in the zenith group
+  zenith: [grafana]
+  # Any hosts in the zenith group should have podman installed
+  podman: [zenith]
