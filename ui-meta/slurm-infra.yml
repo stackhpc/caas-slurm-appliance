@@ -75,6 +75,7 @@ parameters:
       If selected, post-configuration jobs will be executed to validate the core functionality
       of the cluster when it is re-configured.
     kind: boolean
+    default: false
     required: false
     default: true
     options:
