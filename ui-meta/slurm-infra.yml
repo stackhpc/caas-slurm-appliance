@@ -75,7 +75,7 @@ usage_template: |-
   $ ssh rocky@{{ cluster.outputs.cluster_access_ip | default('<cluster ip>') }}
   [rocky@{{ cluster.name }}-login-0 ~]$ sinfo
   PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
-  compute*     up 60-00:00:0    {{ "{0: >3}".format(cluster.parameter_values.compute_count) }}   idle {{ cluster.name }}-compute-[0-{{ cluster.parameter_values.compute_count - 1 }}]
+  compute*     up 60-00:00:0    {{ "%3s" | format(cluster.parameter_values.compute_count) }}   idle {{ cluster.name }}-compute-[0-{{ cluster.parameter_values.compute_count - 1 }}]
   ```
 
   The SSH public key of the user that deployed the cluster is injected. Access can be granted
