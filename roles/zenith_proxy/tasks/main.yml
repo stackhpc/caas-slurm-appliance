@@ -29,16 +29,18 @@
   file:
     path: /etc/zenith/{{ zenith_proxy_service_name }}
     state: directory
+  become: true
 
 - name: Write Zenith client configuration
   template:
     src: zenith-client.yaml.j2
     dest: /etc/zenith/{{ zenith_proxy_service_name }}/client.yaml
+  become: true
 
 - name: Create podman volume to persist SSH key
   containers.podman.podman_volume:
     name: "{{ zenith_proxy_service_name }}-ssh"
-  become: yes
+  become: true
   become_user: "{{ zenith_proxy_podman_user }}"
 
 - name: Initialise Zenith client
@@ -50,13 +52,14 @@
     volumes:
       - /etc/zenith/{{ zenith_proxy_service_name }}:/etc/zenith:ro
       - "{{ zenith_proxy_service_name }}-ssh:/home/zenith/.ssh"
-  become: yes
+  become: true
   become_user: "{{ zenith_proxy_podman_user }}"
 
 - name: Create systemd unit file for Zenith client
   template:
     src: client.service.j2
     dest: /etc/systemd/system/{{ zenith_proxy_service_name }}.service
+  become: true
   register: zenith_proxy_client_systemd_unit
 
 - name: Ensure Zenith client is started and enabled
@@ -65,3 +68,4 @@
     state: "{{ 'restarted' if zenith_proxy_client_systemd_unit is changed else 'started' }}"
     enabled: yes
     daemon_reload: "{{ zenith_proxy_client_systemd_unit is changed }}"
+  become: true
