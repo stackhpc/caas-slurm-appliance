@@ -57,6 +57,10 @@
   become: true
   become_user: "{{ zenith_proxy_podman_user }}"
   register: zenith_proxy_client_init
+  changed_when: zenith_proxy_client_init.rc == 0
+  failed_when: >-
+    zenith_proxy_client_init.rc != 0 and
+    "token has already been used" not in zenith_proxy_client_init.stderr
 
 - name: Create systemd unit file for Zenith client
   template:
