@@ -1,13 +1,26 @@
 ---
 
-- name: Collect usernamespace facts
-  user_namespace_facts:
+- name: Install script for attaching to pod infra containers
+  copy:
+    src: podman-pod-infra-attach.sh
+    dest: /usr/bin/
+    mode: +x
+  become: true
 
-- name: Set facts containing sub-ids
-  set_fact:
-    # podman user is 1000
-    zenith_proxy_host_user_id: "{{ ansible_facts.subuid[zenith_proxy_podman_user]['start'] + 1000 - 1 }}"
-    zenith_proxy_host_group_id: "{{ ansible_facts.subgid[zenith_proxy_podman_user]['start'] + 1000 - 1 }}"
+- name: Create systemd unit for Zenith pod
+  template:
+    src: pod.service.j2
+    dest: /etc/systemd/system/{{ zenith_proxy_service_name }}.service
+  become: true
+  register: zenith_proxy_pod_systemd_unit
+
+- name: Ensure Zenith pod is started and enabled
+  service:
+    name: "{{ zenith_proxy_service_name }}.service"
+    state: "{{ 'restarted' if zenith_proxy_pod_systemd_unit is changed else 'started' }}"
+    enabled: yes
+    daemon_reload: "{{ zenith_proxy_pod_systemd_unit is changed }}"
+  become: true
 
 - block:
     - name: Create systemd unit file for MITM proxy
@@ -65,13 +78,13 @@
 - name: Create systemd unit file for Zenith client
   template:
     src: client.service.j2
-    dest: /etc/systemd/system/{{ zenith_proxy_service_name }}.service
+    dest: /etc/systemd/system/{{ zenith_proxy_client_service_name }}.service
   become: true
   register: zenith_proxy_client_systemd_unit
 
 - name: Ensure Zenith client is started and enabled
   service:
-    name: "{{ zenith_proxy_service_name }}.service"
+    name: "{{ zenith_proxy_client_service_name }}.service"
     state: >-
       {{
         'restarted'

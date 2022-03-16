@@ -8,9 +8,11 @@ zenith_sshd_port: 22
 zenith_proxy_podman_user: "{{ ansible_user }}"
 
 zenith_proxy_service_name: "{{ undef(hint = 'zenith_proxy_service_name is required') }}"
+zenith_proxy_client_service_name: "{{ zenith_proxy_service_name }}-client"
 zenith_proxy_mitm_service_name: "{{ zenith_proxy_service_name }}-mitm"
 
-zenith_proxy_container_name: "{{ zenith_proxy_service_name }}"
+zenith_proxy_pod_name: "{{ zenith_proxy_service_name }}"
+zenith_proxy_client_container_name: "{{ zenith_proxy_client_service_name }}"
 zenith_proxy_mitm_container_name: "{{ zenith_proxy_mitm_service_name }}"
 
 zenith_proxy_client_image_repository: ghcr.io/stackhpc/zenith-client
@@ -31,7 +33,6 @@ zenith_proxy_client_auth_skip: false
 zenith_proxy_client_auth_params: {}
 
 zenith_proxy_mitm_enabled: no
-zenith_proxy_mitm_host: "{{ ansible_default_ipv4.address }}"
 zenith_proxy_mitm_listen_port: 8080
 zenith_proxy_mitm_auth_inject: none  # valid values are 'basic' and 'bearer'
 zenith_proxy_mitm_auth_basic_username: >-

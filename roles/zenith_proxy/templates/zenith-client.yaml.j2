@@ -9,7 +9,7 @@ verify_ssl: {{ 'yes' if zenith_registrar_verify_ssl else 'no' }}
 server_address: {{ zenith_sshd_host }}
 server_port: {{ zenith_sshd_port }}
 {% if zenith_proxy_mitm_enabled %}
-forward_to_host: {{ zenith_proxy_mitm_host }}
+forward_to_host: 127.0.0.1
 forward_to_port: {{ zenith_proxy_mitm_listen_port }}
 {% else %}
 forward_to_host: {{ zenith_proxy_upstream_host }}

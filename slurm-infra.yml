@@ -144,6 +144,7 @@
         zenith_proxy_upstream_port: "{{ grafana_port }}"
         zenith_proxy_client_token: "{{ zenith_token_monitoring }}"
         zenith_proxy_client_auth_params: {}
+        zenith_proxy_mitm_enabled: yes
       when: zenith_subdomain_monitoring is defined
 
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/adhoc/hpctests.yml
