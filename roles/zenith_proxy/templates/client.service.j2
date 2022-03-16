@@ -17,7 +17,6 @@ Restart=always
 User={{ zenith_proxy_podman_user }}
 Group={{ zenith_proxy_podman_user }}
 ExecStart=/usr/bin/podman run \
-  --network slirp4netns:cidr={{ podman_cidr }} \
   --cgroups=no-conmon \
   --replace \
   --restart=no \
