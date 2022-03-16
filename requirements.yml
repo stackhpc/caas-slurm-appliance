@@ -27,6 +27,8 @@ collections:
   - name: ansible.posix
   - name: ansible.netcommon
   - name: community.general
+    # Pegged at 4.5.0 due to https://github.com/ansible-collections/community.general/pull/4281
+    version: 4.5.0
   - name: community.grafana
   - name: community.mysql
   - name: containers.podman

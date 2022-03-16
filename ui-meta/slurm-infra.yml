@@ -53,8 +53,11 @@ parameters:
       WARNING: This can take a significant amount of time to deploy and configure.
     kind: boolean
     required: false
+    default: true
     options:
       checkboxLabel: Enable cluster monitoring?
+      # The permanent option indicates that once set to true the boolean cannot become false
+      permanent: true
 
   - name: cluster_run_validation
     label: Post-configuration validation
@@ -63,5 +66,25 @@ parameters:
       of the cluster when it is re-configured.
     kind: boolean
     required: false
+    default: true
     options:
       checkboxLabel: Run post-configuration validation?
+
+usage_template: |-
+  Access to the cluster is via the external IP using SSH as the `rocky` user:
+
+  ```
+  $ ssh rocky@{{ cluster.outputs.cluster_access_ip | default('[cluster ip]') }}
+  [rocky@{{ cluster.name }}-login-0 ~]$ sinfo
+  PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+  compute*     up 60-00:00:0    {{ "%3s" | format(cluster.parameter_values.compute_count) }}   idle {{ cluster.name }}-compute-[0-{{ cluster.parameter_values.compute_count - 1 }}]
+  ```
+
+  The SSH public key of the user that deployed the cluster is injected. Access can be granted
+  to additional users by placing their SSH public key in `~rocky/.ssh/authorized_keys`.
+
+services:
+  - name: monitoring
+    label: Monitoring
+    icon_url: https://raw.githubusercontent.com/cncf/artwork/master/projects/prometheus/icon/color/prometheus-icon-color.png
+    when: cluster_monitoring_enabled

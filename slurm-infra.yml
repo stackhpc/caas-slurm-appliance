@@ -58,6 +58,13 @@
         groups: "{{ hostvars[item].group_names | terraform_infra_expand_groups(cluster_groups_validation) }}"
       loop: "{{ groups.get('cluster', []) }}"
       when: cluster_run_validation | default(false) | bool
+    # If Zenith is enabled, add the zenith groups to hosts
+    - name: Add clusters hosts to Zenith groups
+      add_host:
+        name: "{{ item }}"
+        groups: "{{ hostvars[item].group_names | terraform_infra_expand_groups(cluster_groups_zenith) }}"
+      loop: "{{ groups.get('cluster', []) }}"
+      when: zenith_subdomain_monitoring is defined
 
 # Ensure that the hosts in the cluster can all refer to each other by their hostname
 - hosts: cluster
@@ -77,7 +84,8 @@
   hosts: control
   gather_facts: no
   become: yes
-  roles: [persist_openhpc_secrets]
+  roles:
+    - persist_openhpc_secrets
 
 # Configure the hosts as a Slurm cluster
 # Use the playbooks invidually rather than the site playbook as it avoids the
@@ -111,5 +119,43 @@
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/bootstrap.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/filesystems.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/slurm.yml
+
+# Deploy the monitoring stack first
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/monitoring.yml
+
+# Configure the Zenith clients that are required
+# First, ensure that podman is installed on all hosts that will run Zenith clients
+- hosts: zenith,!podman
+  tasks:
+    - import_role:
+        name: podman
+        tasks_from: prereqs.yml
+    - import_role:
+        name: podman
+        tasks_from: config.yml
+# Deploy the Zenith client for Grafana
+- hosts: grafana
+  tasks:
+    - include_role:
+        name: zenith_proxy
+      vars:
+        zenith_proxy_service_name: zenith-monitoring
+        zenith_proxy_upstream_host: "{{ grafana_address }}"
+        zenith_proxy_upstream_port: "{{ grafana_port }}"
+        zenith_proxy_client_token: "{{ zenith_token_monitoring }}"
+        zenith_proxy_client_auth_params: {}
+        zenith_proxy_mitm_enabled: yes
+        zenith_proxy_mitm_auth_inject: basic
+        zenith_proxy_mitm_auth_basic_username: grafana
+        zenith_proxy_mitm_auth_basic_password: "{{ vault_grafana_admin_password }}"
+      when: zenith_subdomain_monitoring is defined
+
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/adhoc/hpctests.yml
+
+# Write the outputs as the final task
+- hosts: openstack
+  tasks:
+    - debug: var=outputs
+      vars:
+        outputs:
+          cluster_access_ip: "{{ os_floating_ip_info.floating_ip_address }}"

@@ -1,0 +1,6 @@
+---
+
+zenith_proxy_podman_user: podman
+
+grafana_address: "{{ ansible_default_ipv4.address }}"
+grafana_port: 3000
