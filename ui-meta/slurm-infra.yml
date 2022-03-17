@@ -57,27 +57,12 @@ parameters:
       confirm: true
       min_length: 10
 
-  - name: cluster_monitoring_enabled
-    label: Cluster monitoring
-    description: |
-      If selected, a monitoring stack will be deployed allowing you to track and visualise the
-      state of the cluster.  
-      WARNING: This can take a significant amount of time to deploy and configure.
-    kind: boolean
-    required: false
-    default: true
-    options:
-      checkboxLabel: Enable cluster monitoring?
-      # The permanent option indicates that once set to true the boolean cannot become false
-      permanent: true
-
   - name: cluster_run_validation
     label: Post-configuration validation
     description: >-
       If selected, post-configuration jobs will be executed to validate the core functionality
       of the cluster when it is re-configured.
     kind: boolean
-    default: false
     required: false
     default: true
     options:
@@ -100,4 +85,3 @@ services:
   - name: monitoring
     label: Monitoring
     icon_url: https://raw.githubusercontent.com/cncf/artwork/master/projects/prometheus/icon/color/prometheus-icon-color.png
-    when: cluster_monitoring_enabled
