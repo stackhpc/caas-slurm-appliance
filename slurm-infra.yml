@@ -74,10 +74,10 @@
       loop: "{{ groups.get('cluster', []) }}"
       when: cluster_run_validation | default(false) | bool
     # If Zenith is enabled, add the zenith groups to hosts
-    - name: Add clusters hosts to Zenith groups
+    - name: Add cluster hosts to Zenith groups
       add_host:
         name: "{{ item }}"
-        groups: "{{ hostvars[item].group_names | terraform_infra_expand_groups(cluster_groups_zenith) }}"
+        groups: "{{ hostvars[item].group_names | stackhpc.terraform.terraform_infra_expand_groups(cluster_groups_zenith) }}"
       loop: "{{ groups.get('cluster', []) }}"
       when: zenith_subdomain_monitoring is defined
 
