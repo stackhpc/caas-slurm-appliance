@@ -42,5 +42,5 @@ cluster_groups_validation:
 
 # Additional groups for Zenith support
 cluster_groups_zenith:
-  # Any hosts in the grafana group should go in the zenith group
-  zenith: [grafana]
+  # Any hosts in the grafana and openondemand groups should go in the zenith group
+  zenith: [grafana, openondemand]
