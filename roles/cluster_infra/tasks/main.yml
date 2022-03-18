@@ -27,10 +27,17 @@
 - name: Install Terraform binary
   include_role:
     name: stackhpc.terraform.install
+  vars:
+    terraform_binary_directory: "{{ terraform_binary_directory }}"
 
 - name: Provision infrastructure
   include_role:
     name: stackhpc.terraform.infra
+  vars:
+    terraform_binary_path: "{{ terraform_binary_path }}"
+    terraform_state: "{{ cluster_state | default('present') }}"
+    terraform_backend_type: "{{ terraform_backend_type }}"
+    terraform_backend_config: "{{ terraform_backend_config }}"
 
 # The hosts provisioned by Terraform are put into a primary group by the role
 # These tasks then add those hosts to additional groups depending on the selected options
