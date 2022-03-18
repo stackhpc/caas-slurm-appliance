@@ -31,7 +31,7 @@ ExecStart=/usr/bin/podman run \
 {% if zenith_proxy_mitm_auth_inject == "basic" %}
   --env ZENITH_PROXY_AUTH_INJECT=basic \
   --env ZENITH_PROXY_AUTH_BASIC_USERNAME={{ zenith_proxy_mitm_auth_basic_username }} \
-  --env {{ ("ZENITH_PROXY_AUTH_BASIC_PASSWORD=" ~ zenith_proxy_mitm_auth_basic_password) | quote }} \
+  --env {{ "ZENITH_PROXY_AUTH_BASIC_PASSWORD={}".format(zenith_proxy_mitm_auth_basic_password) | quote }} \
 {% elif zenith_proxy_mitm_auth_inject == "bearer" %}
   --env ZENITH_PROXY_AUTH_INJECT=bearer \
   --env ZENITH_PROXY_AUTH_BEARER_HEADER={{ zenith_proxy_mitm_auth_bearer_header_name }} \
