@@ -9,13 +9,14 @@ verify_ssl: {{ 'yes' if zenith_registrar_verify_ssl else 'no' }}
 server_address: {{ zenith_sshd_host }}
 server_port: {{ zenith_sshd_port }}
 {% if zenith_proxy_mitm_enabled %}
+backend_protocol: http
 forward_to_host: 127.0.0.1
 forward_to_port: {{ zenith_proxy_mitm_listen_port }}
 {% else %}
+backend_protocol: {{ zenith_proxy_upstream_scheme }}
 forward_to_host: {{ zenith_proxy_upstream_host }}
 forward_to_port: {{ zenith_proxy_upstream_port }}
 {% endif %}
-backend_protocol: {{ zenith_proxy_upstream_scheme }}
 {% if zenith_proxy_upstream_read_timeout %}
 read_timeout: {{ zenith_proxy_upstream_read_timeout }}
 {% endif %}
