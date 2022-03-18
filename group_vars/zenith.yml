@@ -1,1 +1,7 @@
 zenith_proxy_podman_user: podman
+
+# Make sure we use the IP address for the Grafana node
+zenith_grafana_address: "{{ hosts[groups['grafana'][0]].ansible_default_ipv4.address }}"
+zenith_grafana_port: "{{ hosts[groups['grafana'][0]].grafana_port }}"
+zenith_grafana_username: "{{ hosts[groups['grafana'][0]].grafana_security.admin_user }}"
+zenith_grafana_password: "{{ hosts[groups['grafana'][0]].grafana_security.admin_password }}"
