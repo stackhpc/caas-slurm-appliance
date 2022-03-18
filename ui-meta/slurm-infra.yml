@@ -66,7 +66,7 @@ usage_template: |-
 
   {% if cluster.outputs.openondemand_url %}
   The Open OnDemand portal for this cluster as available at
-  [{{ cluster.outputs.openondemand_url[8:] }}]({{ cluster.outputs.openondemand_url }}).
+  [{{ cluster.outputs.openondemand_url.slice(8, -1) }}]({{ cluster.outputs.openondemand_url }}).
 
   Enter the username `azimuth` and password `{{ cluster.outputs.azimuth_user_password }}` when prompted.
   {% else %}
@@ -80,7 +80,7 @@ usage_template: |-
 
   ```
   $ ssh azimuth@{{ cluster.outputs.cluster_access_ip | default('[cluster ip]') }}
-  [rocky@{{ cluster.name }}-login-0 ~]$ sinfo
+  [azimuth@{{ cluster.name }}-login-0 ~]$ sinfo
   PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
   compute*     up 60-00:00:0    {{ "%3s" | format(cluster.parameter_values.compute_count) }}   idle {{ cluster.name }}-compute-[0-{{ cluster.parameter_values.compute_count - 1 }}]
   ```
