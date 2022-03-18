@@ -92,13 +92,10 @@
 # Write the outputs as the final task
 - hosts: localhost
   tasks:
-    - name: Set output facts
-      set_fact:
-        cluster_access_ip: "{{ hostvars[groups['openstack'][0]].cluster_floating_ip_address }}"
-        azimuth_user_password: "{{ hostvars[groups['cluster'][0]].vault_azimuth_user_password }}"
-
     - debug: var=outputs
       vars:
         outputs:
-          cluster_access_ip: "{{ cluster_access_ip }}"
-          azimuth_user_password: "{{ azimuth_user_password }}"
+          cluster_access_ip: "{{ hostvars[groups['openstack'][0]].cluster_floating_ip_address }}"
+          # We have to use the ansible_local fact directly as Ansible has a bit of a fit
+          # when there are two 'hostvars' resolutions in a chain
+          azimuth_user_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_azimuth_user_password }}"
