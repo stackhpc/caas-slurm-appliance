@@ -86,6 +86,24 @@
         zenith_proxy_mitm_auth_basic_username: "{{ grafana_security.admin_user }}"
         zenith_proxy_mitm_auth_basic_password: "{{ grafana_security.admin_password }}"
       when: zenith_subdomain_monitoring is defined
+# Deploy the Zenith client for OOD
+- hosts: openondemand
+  tasks:
+    - include_role:
+        name: zenith_proxy
+      vars:
+        zenith_proxy_service_name: zenith-ood
+        # Use the IP address for the upstream host
+        zenith_proxy_upstream_scheme: https
+        zenith_proxy_upstream_host: "{{ ansible_default_ipv4.address }}"
+        zenith_proxy_upstream_port: 443
+        zenith_proxy_client_token: "{{ zenith_token_ood }}"
+        zenith_proxy_client_auth_params: {}
+        zenith_proxy_mitm_enabled: yes
+        zenith_proxy_mitm_auth_inject: basic
+        zenith_proxy_mitm_auth_basic_username: azimuth
+        zenith_proxy_mitm_auth_basic_password: "{{ vault_azimuth_user_password }}"
+      when: zenith_subdomain_ood is defined
 
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/adhoc/hpctests.yml
 
@@ -94,9 +112,17 @@
   tasks:
     - debug: var=outputs
       vars:
-        outputs:
-          cluster_access_ip: "{{ hostvars[groups['openstack'][0]].cluster_floating_ip_address }}"
-          # Ansible has a fit when there are two 'hostvars' evaluations in a resolution chain,
-          # so we have to repeat logic here unfortunately
-          openondemand_url: "https://{{ hostvars[groups['openstack'][0]].cluster_floating_ip_address | replace('.', '-') ~ '.sslip.io' }}"
-          azimuth_user_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_azimuth_user_password }}"
+        # Ansible has a fit when there are two 'hostvars' evaluations in a resolution chain,
+        # so we have to repeat logic here unfortunately
+        outputs: >-
+          {{-
+            { "cluster_access_ip": hostvars[groups['openstack'][0]].cluster_floating_ip_address } |
+              combine(
+                {
+                  "openondemand_url": "https://" ~ (hostvars[groups['openstack'][0]].cluster_floating_ip_address | replace('.', '-')) ~ ".sslip.io",
+                  "azimuth_user_password": hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_azimuth_user_password
+                }
+                if zenith_fqdn_ood is not defined
+                else {}
+              )
+          }}

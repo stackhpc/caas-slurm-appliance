@@ -66,7 +66,7 @@ usage_template: |-
 
   {% if cluster.outputs.openondemand_url %}
   The Open OnDemand portal for this cluster as available at
-  [{{ cluster.outputs.openondemand_url.slice(8, -1) }}]({{ cluster.outputs.openondemand_url }}).
+  [{{ cluster.outputs.openondemand_url.slice(8) }}]({{ cluster.outputs.openondemand_url }}).
 
   Enter the username `azimuth` and password `{{ cluster.outputs.azimuth_user_password }}` when prompted.
   {% else %}
