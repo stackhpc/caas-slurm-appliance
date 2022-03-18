@@ -59,7 +59,7 @@ parameters:
       checkboxLabel: Run post-configuration validation?
 
 usage_template: |-
-  # Accessing the cluster using Open OnDemand
+  ##### Accessing the cluster using Open OnDemand
 
   [Open OnDemand](https://openondemand.org/) is a web portal for managing HPC jobs, including graphical
   environments such as [Jupyter Notebooks](https://jupyter.org/).
@@ -73,7 +73,7 @@ usage_template: |-
   The Open OnDemand portal for this cluster can be accessed from the services list.
   {% endif %}
 
-  # Accessing the cluster using SSH
+  ##### Accessing the cluster using SSH
 
   The cluster can be accessed over SSH via the external IP. The SSH public key of the user that
   deployed the cluster is injected into the `azimuth` user:
