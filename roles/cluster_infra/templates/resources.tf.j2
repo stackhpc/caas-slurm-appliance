@@ -81,9 +81,8 @@ resource "openstack_compute_instance_v2" "login" {
   user_data = <<-EOF
     #cloud-config
     ssh_authorized_keys:
-    {% for key in cluster_ssh_public_keys -%}
-      - {{ key }}
-    {% endfor -%}
+      - {{ cluster_deploy_ssh_public_key }}
+      - {{ cluster_user_ssh_public_key }}
   EOF
 }
 
@@ -100,9 +99,8 @@ resource "openstack_compute_instance_v2" "control" {
   user_data = <<-EOF
     #cloud-config
     ssh_authorized_keys:
-    {% for key in cluster_ssh_public_keys -%}
-      - {{ key }}
-    {% endfor -%}
+      - {{ cluster_deploy_ssh_public_key }}
+      - {{ cluster_user_ssh_public_key }}
   EOF
 }
 
@@ -121,9 +119,8 @@ resource "openstack_compute_instance_v2" "compute" {
   user_data = <<-EOF
     #cloud-config
     ssh_authorized_keys:
-    {% for key in cluster_ssh_public_keys -%}
-      - {{ key }}
-    {% endfor -%}
+      - {{ cluster_deploy_ssh_public_key }}
+      - {{ cluster_user_ssh_public_key }}
   EOF
 }
 
@@ -132,6 +129,6 @@ resource "openstack_compute_instance_v2" "compute" {
 #####
 
 resource "openstack_compute_floatingip_associate_v2" "login_floatingip_assoc" {
-  floating_ip = "{{ cluster_floating_ip }}"
+  floating_ip = "{{ cluster_floating_ip_address }}"
   instance_id = "${openstack_compute_instance_v2.login.id}"
 }

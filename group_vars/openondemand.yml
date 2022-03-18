@@ -54,20 +54,20 @@ grafana_address: "{{ hostvars[groups['grafana'][0]]['api_address'] if 'grafana' 
 grafana_url_openondemand_proxy: "https://{{ openondemand_servername }}/node/{{ groups['grafana'][0] if 'grafana' in groups else '' }}/{{ grafana_port }}"
 
 openondemand_clusters_grafana: 
-    # embed grafana panels in Jobs app: https://osc.github.io/ood-documentation/latest/customization.html#grafana-support
-    grafana:
-      host: "{{ grafana_url_openondemand_proxy if 'openondemand' in groups else grafana_url_direct }}"
-      orgId: 1
-      dashboard:
-        name: "node-exporter-slurm"
-        uid: "node-exporter-slurm"
-        panels:
-          cpu: 77
-          memory: 78
-      labels:
-        cluster: "cluster"
-        host: "host"
-        jobid: "jobid"
+  # embed grafana panels in Jobs app: https://osc.github.io/ood-documentation/latest/customization.html#grafana-support
+  grafana:
+    host: "{{ grafana_url_openondemand_proxy if 'openondemand' in groups else grafana_url_direct }}"
+    orgId: 1
+    dashboard:
+      name: "node-exporter-slurm"
+      uid: "node-exporter-slurm"
+      panels:
+        cpu: 77
+        memory: 78
+    labels:
+      cluster: "cluster"
+      host: "host"
+      jobid: "jobid"
 
 _opeonondemand_unset_auth: '    RequestHeader unset Authorization'
 

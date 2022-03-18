@@ -3,83 +3,8 @@
 # Provision the infrastructure using Terraform
 - name: Provision infrastructure
   hosts: openstack
-  collections:
-    - stackhpc.terraform
-  pre_tasks:
-    # We need to convert the floating IP id to an address for Terraform
-    - name: Look up floating IP
-      include_role:
-        name: stackhpc.terraform.infra
-        tasks_from: lookup_floating_ip
-      vars:
-        os_floating_ip_id: "{{ cluster_floating_ip }}"
-
-    - name: Make Terraform project directory
-      file:
-        path: "{{ terraform_project_path }}"
-        state: directory
-
-    - name: Template Terraform files into project directory
-      template:
-        src: "{{ item }}.j2"
-        dest: "{{ terraform_project_path }}/{{ item }}"
-      loop:
-        - outputs.tf
-        - providers.tf
-        - resources.tf
-      vars:
-        cluster_floating_ip: "{{ os_floating_ip_info.floating_ip_address }}"
-        # We need to inject the user's SSH key and the deploy key for the cluster
-        cluster_ssh_public_keys: "{{ [cluster_deploy_ssh_public_key, cluster_user_ssh_public_key] }}"
-        cluster_partition_name: "{{ openhpc_slurm_partitions[0].name }}"
-
   roles:
-    - role: stackhpc.terraform.install
-    - role: stackhpc.terraform.infra
-      vars:
-        # Image cloud user, use extraVars.__ALL__.cluster_user in values.yaml
-        # to change if required
-        cluster_ssh_user: "{{ cluster_user | default('rocky') }}"
-        # Variables controlling the Terraform provisioning
-        terraform_state: "{{ cluster_state | default('present') }}"
-        terraform_backend_type: "{{ ( 'CONSUL_HTTP_ADDR' in ansible_env ) | ternary('consul', 'local') }}"
-        terraform_backend_config: "{{ terraform_backend_config_defaults[terraform_backend_type] }}"
-
-  # The hosts provisioned by Terraform are put into a primary group by the role
-  # These tasks then add those hosts to additional groups depending on the selected options
-  post_tasks:
-    # Add the hosts to the required groups
-    - name: Add cluster hosts to required groups
-      add_host:
-        name: "{{ item }}"
-        groups: "{{ hostvars[item].group_names | stackhpc.terraform.terraform_infra_expand_groups(cluster_groups_required) }}"
-      loop: "{{ groups.get('cluster', []) }}"
-    # Add hosts to the OOD groups
-    - name: Add cluster hosts to OOD groups
-      add_host:
-        name: "{{ item }}"
-        groups: "{{ hostvars[item].group_names | stackhpc.terraform.terraform_infra_expand_groups(cluster_groups_ood) }}"
-      loop: "{{ groups.get('cluster', []) }}"
-    # Add hosts to the monitoring groups
-    - name: Add cluster hosts to monitoring groups
-      add_host:
-        name: "{{ item }}"
-        groups: "{{ hostvars[item].group_names | stackhpc.terraform.terraform_infra_expand_groups(cluster_groups_monitoring) }}"
-      loop: "{{ groups.get('cluster', []) }}"
-    # If validation was requested, add the validation groups to hosts
-    - name: Add cluster hosts to validation groups
-      add_host:
-        name: "{{ item }}"
-        groups: "{{ hostvars[item].group_names | stackhpc.terraform.terraform_infra_expand_groups(cluster_groups_validation) }}"
-      loop: "{{ groups.get('cluster', []) }}"
-      when: cluster_run_validation | default(false) | bool
-    # If Zenith is enabled, add the zenith groups to hosts
-    - name: Add cluster hosts to Zenith groups
-      add_host:
-        name: "{{ item }}"
-        groups: "{{ hostvars[item].group_names | stackhpc.terraform.terraform_infra_expand_groups(cluster_groups_zenith) }}"
-      loop: "{{ groups.get('cluster', []) }}"
-      when: zenith_subdomain_monitoring is defined
+    - cluster_infra
 
 # Setup tasks now that all hosts have been added to the correct groups
 - hosts: cluster
@@ -95,13 +20,6 @@
       loop_control:
         loop_var: host
 
-    # Ensure that relevant hosts have the openondemand servername in their own hostvars
-    - name: Make openondemand_servername available to relevant hosts
-      set_fact:
-        openondemand_servername: "{{ hostvars[groups['openstack'][0]].os_floating_ip_info.floating_ip_address | replace('.', '-') ~ '.sslip.io' }}"
-      delegate_to: "{{ item }}"
-      loop: "{{ groups['openondemand'] + ( groups['grafana'] if 'grafana' in groups else [] ) | unique }}"
-
 # Ensure that the secrets are generated and persisted on the control host
 - name: Generate and persist secrets
   hosts: control
@@ -110,19 +28,14 @@
   roles:
     - persist_openhpc_secrets
 
-# Configure the hosts as a Slurm cluster
-# Use the playbooks invidually rather than the site playbook as it avoids the
-# need to define the environment variables referencing an environment
-
 # validate.yml asserts presence of a control group which doesn't exist when 
 # destroying infra, so only validate when we're not destroying
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/validate.yml
   when: cluster_state is not defined or (cluster_state is defined and cluster_state != "absent")
 
-# The first task in the bootstrap playbook causes the home directory of the centos user to be moved
-# on the first run
+# The first task in the bootstrap playbook causes the home directory of the rocky user to be moved on the first run
 # This can disrupt the SSH connection, particularly because we use the login host as a jump host
-# So we move the home directory on the login node and reset the connection first
+# So we move the home directory on the login node and reset the connections first
 - hosts: login
   gather_facts: false
   tasks:
@@ -144,19 +57,6 @@
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/slurm.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/portal.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/iam.yml
-
-# Add the azimuth user SSH key
-- hosts: cluster
-  gather_facts: false
-  tasks:
-    - name: Add Azimuth user SSH key
-      ansible.posix.authorized_key:
-        user: "{{ basic_users_users[0].name }}"
-        state: present
-        key: "{{ cluster_user_ssh_public_key }}"
-      become: true
-
-# Deploy the monitoring stack
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/monitoring.yml
 
 # Configure the Zenith clients that are required
@@ -189,9 +89,10 @@
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/adhoc/hpctests.yml
 
 # Write the outputs as the final task
-- hosts: openstack
+- hosts: localhost
   tasks:
     - debug: var=outputs
       vars:
         outputs:
-          cluster_access_ip: "{{ os_floating_ip_info.floating_ip_address }}"
+          cluster_access_ip: "{{ hostvars[groups['openstack'][0]].cluster_floating_ip_address }}"
+          azimuth_user_password: "{{ hostvars[groups['cluster'][0]].vault_azimuth_user_password }}"
