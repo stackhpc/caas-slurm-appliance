@@ -96,6 +96,7 @@
       vars:
         outputs:
           cluster_access_ip: "{{ hostvars[groups['openstack'][0]].cluster_floating_ip_address }}"
-          # We have to use the ansible_local fact directly as Ansible has a bit of a fit
-          # when there are two 'hostvars' resolutions in a chain
+          # Ansible has a fit when there are two 'hostvars' evaluations in a resolution chain,
+          # so we have to repeat logic here unfortunately
+          openondemand_url: "https://{{ hostvars[groups['openstack'][0]].cluster_floating_ip_address | replace('.', '-') ~ '.sslip.io' }}"
           azimuth_user_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_azimuth_user_password }}"
