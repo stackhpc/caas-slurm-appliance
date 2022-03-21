@@ -18,10 +18,10 @@ roles:
   - src: cloudalchemy.grafana
   - src: geerlingguy.mysql
   - src: jriguera.configdrive
-  - name: stackhpc.terraform-infra
-    src: https://github.com/stackhpc/ansible-role-terraform-infra
+  - src: https://github.com/OSC/ood-ansible.git
+    name: osc.ood
     type: git
-    version: 4d9d67b5a1866edf6988a1f7e9e64868df8f65ae
+    version: v2.0.5
 
 collections:
   - name: ansible.posix
@@ -33,6 +33,9 @@ collections:
   - name: community.mysql
   - name: containers.podman
   - name: openstack.cloud
+  - name: https://github.com/stackhpc/ansible-collection-terraform
+    type: git
+    version: ae1dc46a9d266bcdc6e79a6e290edbb080596f7f
   - name: https://github.com/stackhpc/ansible_collection_slurm_openstack_tools
     type: git
     version: v0.1.0

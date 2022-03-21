@@ -49,6 +49,7 @@
     src: zenith-client.yaml.j2
     dest: /etc/zenith/{{ zenith_proxy_service_name }}/client.yaml
   become: true
+  register: zenith_proxy_client_config_file
 
 - name: Create podman volume to persist SSH key
   containers.podman.podman_volume:
@@ -89,6 +90,7 @@
       {{
         'restarted'
         if (
+            zenith_proxy_client_config_file is changed or
             zenith_proxy_client_systemd_unit is changed or
             zenith_proxy_client_init is changed
         )

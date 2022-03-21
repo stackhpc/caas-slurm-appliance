@@ -1,49 +1,18 @@
 # The default Terraform state key for backends that support it
 terraform_state_key: "cluster/{{ cluster_id }}/tfstate"
 
+# Set up the terraform backend
+terraform_backend_type: "{{ 'consul' if 'CONSUL_HTTP_ADDR' in ansible_env else 'local' }}"
 terraform_backend_config_defaults:
   consul:
     path: "{{ terraform_state_key }}"
     gzip: "true"
   local: {}
+terraform_backend_config: "{{ terraform_backend_config_defaults[terraform_backend_type] }}"
 
-#####
-## WARNING
-##
-## The groups specified here should replicate the groups in the StackHPC Slurm appliance environments
-##
-## https://github.com/stackhpc/ansible-slurm-appliance/blob/main/environments/common/inventory/groups
-## https://github.com/stackhpc/ansible-slurm-appliance/blob/main/environments/common/layouts/everything
-## https://github.com/stackhpc/ansible-slurm-appliance/blob/main/environments/common/layouts/minimal
-#####
-# These groups should represent the minimal layout
-cluster_groups_required:
-  login:         ["{{ cluster_name }}_login"]
-  control:       ["{{ cluster_name }}_control"]
-  compute:       ["{{ cluster_name }}_compute"]
-  openhpc:       [login, control, compute]
-  cluster:       [openhpc]
-  selinux:       [cluster]
-  nfs:           [cluster]
-  mysql:         [control]
-  update:        [cluster]
+terraform_binary_directory: "{{ playbook_dir }}/bin"
+terraform_binary_path: "{{ terraform_binary_directory }}/terraform"
+terraform_project_path: "{{ playbook_dir }}/terraform"
 
-# These are the additional groups required for monitoring (see everything layout)
-cluster_groups_monitoring:
-  podman:        [opendistro, filebeat]
-  prometheus:    [control]
-  grafana:       [control]
-  alertmanager:  [control]
-  node_exporter: [cluster]
-  opendistro:    [control]
-  slurm_stats:   [control]
-  filebeat:      [slurm_stats]
-
-# Additional groups for running the cluster validation
-cluster_groups_validation:
-  hpctests: [login]
-
-# Additional groups for Zenith support
-cluster_groups_zenith:
-  # Any hosts in the grafana group should go in the zenith group
-  zenith: [grafana]
+terraform_state: "{{ cluster_state | default('present') }}"
+cluster_ssh_user: rocky

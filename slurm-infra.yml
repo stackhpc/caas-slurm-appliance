@@ -3,73 +3,14 @@
 # Provision the infrastructure using Terraform
 - name: Provision infrastructure
   hosts: openstack
-  pre_tasks:
-    # We need to convert the floating IP id to an address for Terraform
-    - name: Look up floating IP
-      include_role:
-        name: stackhpc.terraform-infra
-        tasks_from: lookup_floating_ip
-      vars:
-        os_floating_ip_id: "{{ cluster_floating_ip }}"
   roles:
-    - role: stackhpc.terraform-infra
-      vars:
-        # Image cloud user, use extraVars.__ALL__.cluster_user in values.yaml
-        # to change if required
-        cluster_ssh_user: "{{ cluster_user | default('rocky') }}"
-        # Variables controlling the Terraform provisioning
-        terraform_project_path: "{{ playbook_dir }}/terraform"
-        terraform_state: "{{ cluster_state | default('present') }}"
-        terraform_backend_type: "{{ ( 'CONSUL_HTTP_ADDR' in ansible_env ) | ternary('consul', 'local') }}"
-        terraform_backend_config: "{{ terraform_backend_config_defaults[terraform_backend_type] }}"
-        terraform_variables:
-          cluster_name: "{{ cluster_name }}"
-          cluster_network: "{{ cluster_network }}"
-          cluster_floating_ip: "{{ os_floating_ip_info.floating_ip_address }}"
-          # We need to inject the user's SSH key and the deploy key for the cluster
-          cluster_ssh_public_keys: "{{ [cluster_deploy_ssh_public_key, cluster_user_ssh_public_key] | to_json }}"
-          compute_count: "{{ compute_count }}"
-          login_image: "{{ cluster_image }}"
-          control_image: "{{ cluster_image }}"
-          compute_image: "{{ cluster_image }}"
-          login_flavor: "{{ login_flavor }}"
-          control_flavor: "{{ control_flavor }}"
-          compute_flavor: "{{ compute_flavor }}"
-  # The hosts provisioned by Terraform are put into a primary group by the role
-  # These tasks then add those hosts to additional groups depending on the selected options
-  post_tasks:
-    # Add the hosts to the required groups
-    - name: Add cluster hosts to required groups
-      add_host:
-        name: "{{ item }}"
-        groups: "{{ hostvars[item].group_names | terraform_infra_expand_groups(cluster_groups_required) }}"
-      loop: "{{ groups.get('cluster', []) }}"
-    # If monitoring was requested, add the monitoring groups to hosts
-    - name: Add cluster hosts to monitoring groups
-      add_host:
-        name: "{{ item }}"
-        groups: "{{ hostvars[item].group_names | terraform_infra_expand_groups(cluster_groups_monitoring) }}"
-      loop: "{{ groups.get('cluster', []) }}"
-      when: cluster_monitoring_enabled | default(false) | bool
-    # If validation was requested, add the validation groups to hosts
-    - name: Add cluster hosts to validation groups
-      add_host:
-        name: "{{ item }}"
-        groups: "{{ hostvars[item].group_names | terraform_infra_expand_groups(cluster_groups_validation) }}"
-      loop: "{{ groups.get('cluster', []) }}"
-      when: cluster_run_validation | default(false) | bool
-    # If Zenith is enabled, add the zenith groups to hosts
-    - name: Add clusters hosts to Zenith groups
-      add_host:
-        name: "{{ item }}"
-        groups: "{{ hostvars[item].group_names | terraform_infra_expand_groups(cluster_groups_zenith) }}"
-      loop: "{{ groups.get('cluster', []) }}"
-      when: zenith_subdomain_monitoring is defined
+    - cluster_infra
 
-# Ensure that the hosts in the cluster can all refer to each other by their hostname
+# Setup tasks now that all hosts have been added to the correct groups
 - hosts: cluster
   become: yes
   tasks:
+    # Ensure that the hosts in the cluster can all refer to each other by their hostname
     - name: Populate /etc/hosts with cluster hosts
       lineinfile:
         path: /etc/hosts
@@ -87,19 +28,14 @@
   roles:
     - persist_openhpc_secrets
 
-# Configure the hosts as a Slurm cluster
-# Use the playbooks invidually rather than the site playbook as it avoids the
-# need to define the environment variables referencing an environment
-
 # validate.yml asserts presence of a control group which doesn't exist when 
 # destroying infra, so only validate when we're not destroying
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/validate.yml
   when: cluster_state is not defined or (cluster_state is defined and cluster_state != "absent")
 
-# The first task in the bootstrap playbook causes the home directory of the centos user to be moved
-# on the first run
+# The first task in the bootstrap playbook causes the home directory of the rocky user to be moved on the first run
 # This can disrupt the SSH connection, particularly because we use the login host as a jump host
-# So we move the home directory on the login node and reset the connection first
+# So we move the home directory on the login node and reset the connections first
 - hosts: login
   gather_facts: false
   tasks:
@@ -119,8 +55,8 @@
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/bootstrap.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/filesystems.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/slurm.yml
-
-# Deploy the monitoring stack first
+- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/portal.yml
+- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/iam.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/monitoring.yml
 
 # Configure the Zenith clients that are required
@@ -140,22 +76,55 @@
         name: zenith_proxy
       vars:
         zenith_proxy_service_name: zenith-monitoring
-        zenith_proxy_upstream_host: "{{ grafana_address }}"
+        # Use the IP address for the upstream host
+        zenith_proxy_upstream_host: "{{ ansible_default_ipv4.address }}"
         zenith_proxy_upstream_port: "{{ grafana_port }}"
         zenith_proxy_client_token: "{{ zenith_token_monitoring }}"
-        zenith_proxy_client_auth_params: {}
+        zenith_proxy_client_auth_params:
+          tenancy-id: "{{ openstack_project_id }}"
         zenith_proxy_mitm_enabled: yes
         zenith_proxy_mitm_auth_inject: basic
-        zenith_proxy_mitm_auth_basic_username: grafana
-        zenith_proxy_mitm_auth_basic_password: "{{ vault_grafana_admin_password }}"
+        zenith_proxy_mitm_auth_basic_username: "{{ grafana_security.admin_user }}"
+        zenith_proxy_mitm_auth_basic_password: "{{ grafana_security.admin_password }}"
       when: zenith_subdomain_monitoring is defined
+# Deploy the Zenith client for OOD
+- hosts: openondemand
+  tasks:
+    - include_role:
+        name: zenith_proxy
+      vars:
+        zenith_proxy_service_name: zenith-ood
+        # Use the IP address for the upstream host
+        zenith_proxy_upstream_scheme: https
+        zenith_proxy_upstream_host: "{{ ansible_default_ipv4.address }}"
+        zenith_proxy_upstream_port: 443
+        zenith_proxy_client_token: "{{ zenith_token_ood }}"
+        zenith_proxy_client_auth_params:
+          tenancy-id: "{{ openstack_project_id }}"
+        zenith_proxy_mitm_enabled: yes
+        zenith_proxy_mitm_auth_inject: basic
+        zenith_proxy_mitm_auth_basic_username: azimuth
+        zenith_proxy_mitm_auth_basic_password: "{{ vault_azimuth_user_password }}"
+      when: zenith_subdomain_ood is defined
 
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/adhoc/hpctests.yml
 
 # Write the outputs as the final task
-- hosts: openstack
+- hosts: localhost
   tasks:
     - debug: var=outputs
       vars:
-        outputs:
-          cluster_access_ip: "{{ os_floating_ip_info.floating_ip_address }}"
+        # Ansible has a fit when there are two 'hostvars' evaluations in a resolution chain,
+        # so we have to repeat logic here unfortunately
+        outputs: >-
+          {{-
+            { "cluster_access_ip": hostvars[groups['openstack'][0]].cluster_floating_ip_address } |
+              combine(
+                {
+                  "openondemand_url": "https://" ~ (hostvars[groups['openstack'][0]].cluster_floating_ip_address | replace('.', '-')) ~ ".sslip.io",
+                  "azimuth_user_password": hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_azimuth_user_password
+                }
+                if zenith_fqdn_ood is not defined
+                else {}
+              )
+          }}
