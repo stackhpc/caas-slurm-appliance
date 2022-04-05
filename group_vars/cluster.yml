@@ -1,5 +1,7 @@
 # Convert the variable supplied by the portal into the one expected by the Slurm appliance
 update_enable: "{{ cluster_upgrade_system_packages | default('false') | bool }}"
+# Don't store the update logs as they are created in the job container anyway
+update_log_path: "{{ playbook_dir }}/logs/{{ inventory_hostname }}-updates.log"
 
 # Read the secrets from the Ansible local facts on the control host
 vault_azimuth_user_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_azimuth_user_password }}"
