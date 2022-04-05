@@ -1,34 +1,34 @@
 ---
 roles:
   - src: stackhpc.nfs
-  - name: stackhpc.openhpc
-    src: https://github.com/stackhpc/ansible-role-openhpc
-    type: git
-    version: v0.10.0
-  #- src: cloudalchemy.node_exporter
+    version: v21.2.1
+  - src: https://github.com/stackhpc/ansible-role-openhpc.git
+    version: v0.12.0
+    name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
+    version: support-rhel-clones
     name: cloudalchemy.node_exporter
-    version: support-rhel-clones # Fixes for Rocky
   - src: cloudalchemy.blackbox-exporter
-  #- src: cloudalchemy.prometheus
+    version: 1.0.0
   - src: https://github.com/cloudalchemy/ansible-prometheus.git
+    version: 4d2c8d742de39e50387e0aa6d5510b21c7451343 # need fix in preceeding commit for rocky
     name: cloudalchemy.prometheus
-    version: 0795bdb1a5a424044dc7e8200129f61e53140523 # Fixes for Rocky
   - src: cloudalchemy.alertmanager
+    version: 0.19.1
   - src: cloudalchemy.grafana
+    version: 0.18.0
   - src: geerlingguy.mysql
+    version: 3.3.2
   - src: jriguera.configdrive
   - src: https://github.com/OSC/ood-ansible.git
     name: osc.ood
-    type: git
     version: v2.0.5
 
 collections:
   - name: ansible.posix
   - name: ansible.netcommon
   - name: community.general
-    # Pegged at 4.5.0 due to https://github.com/ansible-collections/community.general/pull/4281
-    version: 4.5.0
+    version: 4.5.0  # https://github.com/ansible-collections/community.general/pull/4281
   - name: community.grafana
   - name: community.mysql
   - name: containers.podman
