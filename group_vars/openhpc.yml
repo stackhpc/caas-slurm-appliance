@@ -1,5 +1,1 @@
 openhpc_cluster_name: "{{ cluster_name }}"
-
-openhpc_config:
-  SlurmctldDebug: debug
-  SlurmdDebug: debug
