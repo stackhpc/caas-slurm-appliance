@@ -1,5 +1,5 @@
 # Convert the variable supplied by the portal into the one expected by the Slurm appliance
-update_enable: "{{ cluster_upgrade_system_packages | default('false') | bool }}"
+update_enable: false
 # Don't store the update logs as they are created in the job container anyway
 update_log_path: "{{ playbook_dir }}/logs/{{ inventory_hostname }}-updates.log"
 
