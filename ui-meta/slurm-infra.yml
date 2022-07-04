@@ -20,24 +20,6 @@ parameters:
       min: 1
     default: 3
 
-  - name: login_flavor
-    label: Login node size
-    description: The size to use for the login node.
-    kind: "cloud.size"
-    immutable: true
-    options:
-      min_ram: 2048
-      min_disk: 10
-
-  - name: control_flavor
-    label: Control node size
-    description: The size to use for the control node.
-    kind: "cloud.size"
-    immutable: true
-    options:
-      min_ram: 2048
-      min_disk: 10
-
   - name: compute_flavor
     label: Compute node size
     description: The size to use for the compute node.
