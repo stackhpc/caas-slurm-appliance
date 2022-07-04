@@ -76,7 +76,11 @@ resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_ingr
 resource "openstack_compute_instance_v2" "login" {
   name      = "{{ cluster_name }}-login-0"
   image_id  = "{{ cluster_image }}"
+  {% if login_flavor_name is defined %}
+  flavor_name = "{{ login_flavor_name }}"
+  {% else %}
   flavor_id = "{{ login_flavor }}"
+  {% endif %}
 
   network {
     name = "{{ cluster_network }}"
@@ -97,8 +101,12 @@ resource "openstack_compute_instance_v2" "login" {
 resource "openstack_compute_instance_v2" "control" {
   name      = "{{ cluster_name }}-control-0"
   image_id  = "{{ cluster_image }}"
-  flavor_id = "{{ compute_flavor }}"
-
+  {% if control_flavor_name is defined %}
+  flavor_name = "{{ control_flavor_name }}"
+  {% else %}
+  flavor_id = "{{ control_flavor }}"
+  {% endif %}
+  
   network {
     name = "{{ cluster_network }}"
   }
