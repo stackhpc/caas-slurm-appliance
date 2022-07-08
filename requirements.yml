@@ -3,10 +3,10 @@ roles:
   - src: stackhpc.nfs
     version: v21.2.1
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
-    version: v0.12.0
+    version: v0.13.0
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
-    version: support-rhel-clones
+    version: feature/no-install
     name: cloudalchemy.node_exporter
   - src: cloudalchemy.blackbox-exporter
     version: 1.0.0
@@ -15,8 +15,9 @@ roles:
     name: cloudalchemy.prometheus
   - src: cloudalchemy.alertmanager
     version: 0.19.1
-  - src: cloudalchemy.grafana
-    version: 0.18.0
+  - src: https://github.com/stackhpc/ansible-grafana.git
+    name: cloudalchemy.grafana
+    version: service-state
   - src: geerlingguy.mysql
     version: 3.3.2
   - src: jriguera.configdrive
@@ -38,4 +39,4 @@ collections:
     version: ae1dc46a9d266bcdc6e79a6e290edbb080596f7f
   - name: https://github.com/stackhpc/ansible_collection_slurm_openstack_tools
     type: git
-    version: v0.1.0
+    version: v0.2.0
