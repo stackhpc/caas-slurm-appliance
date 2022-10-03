@@ -16,3 +16,5 @@ terraform_project_path: "{{ playbook_dir }}/terraform"
 
 terraform_state: "{{ cluster_state | default('present') }}"
 cluster_ssh_user: rocky
+
+state_volume_size: 150 # GB
