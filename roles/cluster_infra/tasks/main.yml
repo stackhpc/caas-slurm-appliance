@@ -52,6 +52,13 @@
     groups: "{{ hostvars[item].group_names | stackhpc.terraform.terraform_infra_expand_groups(cluster_groups_monitoring) }}"
   loop: "{{ groups.get('cluster', []) }}"
 
+- name: Add cluster hosts to validation groups
+  add_host:
+    name: "{{ item }}"
+    groups: "{{ hostvars[item].group_names | stackhpc.terraform.terraform_infra_expand_groups(cluster_groups_validation) }}"
+  loop: "{{ groups.get('cluster', []) }}"
+  when: cluster_run_validation | default(false) | bool
+
 - name: Add cluster hosts to Zenith groups
   add_host:
     name: "{{ item }}"

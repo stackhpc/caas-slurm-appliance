@@ -108,7 +108,6 @@
       when: zenith_subdomain_ood is defined
 
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/adhoc/hpctests.yml
-  when: cluster_run_validation | default(false) | bool
 
 # Write the outputs as the final task
 - hosts: localhost
