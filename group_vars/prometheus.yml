@@ -6,7 +6,3 @@ openondemand_address: "{{ hostvars[groups['openondemand'].0].api_address if 'ope
 # Override group_var set in ansible-slurm-appliance all group - unless
 # OOD is being deployed then there won't be an OOD group
 prometheus_scrape_configs: "{{ prometheus_scrape_configs_default + (openondemand_scrape_configs if ( 'openondemand' in groups ) else [] ) }}"
-
-# Modify to account for the fact we are running outside of the expected environment system
-prometheus_alert_rules_files:
-- "{{ playbook_dir }}/../environments/common/files/prometheus/rules/*.rules"

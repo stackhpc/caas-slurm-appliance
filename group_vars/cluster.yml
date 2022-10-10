@@ -1,3 +1,7 @@
+# Account for the fact we are running outside of the expected environment system:
+# NB: this only works for playbooks in ansible/*, not in ansible/adhoc!
+appliances_repository_root: "{{ playbook_dir }}/../"
+
 # Convert the variable supplied by the portal into the one expected by the Slurm appliance
 update_enable: "{{ cluster_upgrade_system_packages | default('false') | bool }}"
 # The update logs are written on the Ansible controller
