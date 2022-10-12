@@ -1,24 +1,28 @@
 ---
 
-- name: Check if OpenHPC secrets exist
+- name: Check if OpenHPC secrets exist in persistent storage
   stat:
-    path: /etc/ansible/facts.d/openhpc_secrets.fact
+    path: "{{ appliances_state_dir }}/openhpc_secrets.fact"
   register: openhpc_secrets_stat
 
-- name: Persist OpenHPC secrets
-  block:
-    - name: Ensure Ansible facts directory exists
-      file:
-        path: /etc/ansible/facts.d
-        state: directory
-        recurse: yes
-     
-    - name: Write OpenHPC secrets
-      template:
-        src: openhpc_secrets.fact
-        dest: /etc/ansible/facts.d/openhpc_secrets.fact
+- name: Ensure Ansible facts directory exists
+  file:
+    path: /etc/ansible/facts.d
+    state: directory
+    recurse: yes
 
-    - name: Re-read facts after adding custom fact
-      ansible.builtin.setup:
-        filter: ansible_local
-  when: "not openhpc_secrets_stat.stat.exists"
+- name: Write OpenHPC secrets to persistent storage
+  template:
+    src: openhpc_secrets.fact
+    dest: /etc/ansible/facts.d/openhpc_secrets.fact
+  when: "not openhpc_secrets_stat.stat.exists" # required as templated ones are random
+
+- name: Make OpenHPC secrets available to local facts
+  copy:
+    src: "{{ appliances_state_dir }}/openhpc_secrets.fact"
+    dest: /etc/ansible/facts.d/openhpc_secrets.fact
+    remote_src: yes
+
+- name: Re-read facts after adding custom fact
+  ansible.builtin.setup:
+    filter: ansible_local
