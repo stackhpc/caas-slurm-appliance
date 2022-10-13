@@ -40,5 +40,5 @@ collections:
   - name: openstack.cloud
   - name: https://github.com/stackhpc/ansible-collection-terraform
     type: git
-    version: ae1dc46a9d266bcdc6e79a6e290edbb080596f7f
+    version: 75fb75132bbc77e3e78a05ba674458131da2b1dd
     
