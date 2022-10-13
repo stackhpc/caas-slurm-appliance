@@ -14,7 +14,7 @@
 - name: Write OpenHPC secrets to persistent storage
   template:
     src: openhpc_secrets.fact
-    dest: /etc/ansible/facts.d/openhpc_secrets.fact
+    dest: "{{ appliances_state_dir }}/openhpc_secrets.fact"
   when: "not openhpc_secrets_stat.stat.exists" # required as templated ones are random
 
 - name: Make OpenHPC secrets available to local facts
