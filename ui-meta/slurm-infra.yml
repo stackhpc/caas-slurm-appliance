@@ -28,6 +28,15 @@ parameters:
     options:
       min_ram: 2048
       min_disk: 10
+  
+  - name: home_volme_size
+    label: Home volume size
+    description: The size in GB of the volume to use for home directories
+    kind: integer
+    immutable: true
+    options:
+      min: 1
+    default: 100
 
   - name: cluster_run_validation
     label: Post-configuration validation

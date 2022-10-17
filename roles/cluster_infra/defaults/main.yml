@@ -18,6 +18,12 @@ cluster_groups_required:
   mysql:         [control]
   update:        [cluster]
   basic_users:   [cluster]
+  fail2ban:      [login]
+  firewalld:     [fail2ban]
+  # ignore these for the moment:
+  #etc_hosts:     []
+  # cloud_init:   [etc_hosts]
+  systemd:        [opendistro, grafana, control, prometheus]
 
 # These are the additional groups required for monitoring (see everything layout)
 cluster_groups_monitoring:

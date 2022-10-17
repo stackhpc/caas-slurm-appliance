@@ -1,2 +1,0 @@
-# Modify to account for the fact we are running outside of the expected environment system
-opendistro_internal_users_path: "{{ playbook_dir }}/../environments/common/files/opendistro/internal_users.yml"
