@@ -1,29 +1,50 @@
 ---
 
-- name: Check if OpenHPC secrets exist
-  stat:
-    path: "{{ appliances_state_dir }}/ansible/facts.d/openhpc_secrets.fact"
-  register: openhpc_secrets_stat
+- name: Ensure Ansible facts directory exists
+  file:
+    path: "{{ appliances_state_dir }}/ansible.facts.d"
+    state: directory
+    owner: root
+    mode: 0600
 
-- name: Persist OpenHPC secrets
+- name: Check if OpenHPC secrets exist in persistent state dir
+  stat:
+    path: "{{ appliances_state_dir }}/ansible.facts.d/openhpc_secrets.fact"
+  register: openhpc_secrets
+
+- name: Check if an OpenHPC facts file exists in /etc/ansible/facts.d
+  stat:
+    path: "/etc/ansible/facts.d/openhpc_secrets.fact"
+  register: existing_openhpc_secrets
+
+- name: Create or move OpenHPC secrets to persistent state volume
   block:
-    - name: Ensure Ansible facts directory exists
-      file:
-        path: "{{ appliances_state_dir }}/ansible/facts.d"
-        state: directory
-        owner: root
-        mode: 0600
-        recurse: yes
-     
-    - name: Write OpenHPC secrets
+    - name: Move OpenHPC secrets to persistent state volume if they already exist in /etc/ansible/facts.d
+      block:
+        - name: Copy existing OpenHPC facts file to persistent storage
+          copy:
+            remote_src: true
+            src: "/etc/ansible/facts.d/openhpc_secrets.fact"
+            dest: "{{ appliances_state_dir }}/ansible.facts.d/openhpc_secrets.fact"
+            mode: 0600
+            owner: root
+
+        - name: Remove existing OpenHPC secrets file from /etc/ansible/facts.d
+          file:
+            state: absent
+            path: "/etc/ansible/facts.d/openhpc_secrets.fact"
+      when: existing_openhpc_secrets.stat.exists
+    
+    - name: Write new OpenHPC secrets
       template:
         src: openhpc_secrets.fact
         dest: "{{ appliances_state_dir }}/ansible/facts.d/openhpc_secrets.fact"
         owner: root
         mode: 0600
-  when: "not openhpc_secrets_stat.stat.exists"
+      when: "not existing_openhpc_secrets.stat.exists"
+  when: "not openhpc_secrets.stat.exists"  
   
-- name: Read facts
+- name: Read OpenHPC secrets
   ansible.builtin.setup:
-    fact_path: "{{ appliances_state_dir }}/ansible/facts.d"
+    fact_path: "{{ appliances_state_dir }}/ansible.facts.d"
     filter: ansible_local
