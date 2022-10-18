@@ -5,25 +5,31 @@
     path: "{{ appliances_state_dir }}/ansible/facts.d/openhpc_secrets.fact"
   register: openhpc_secrets_stat
 
-- name: Persist OpenHPC secrets
-  block:
-    - name: Ensure Ansible facts directory exists
-      file:
-        path: "{{ appliances_state_dir }}/ansible/facts.d"
-        state: directory
-        owner: root
-        mode: 0600
-        recurse: yes
-     
-    - name: Write OpenHPC secrets
-      template:
-        src: openhpc_secrets.fact
-        dest: "{{ appliances_state_dir }}/ansible/facts.d/openhpc_secrets.fact"
-        owner: root
-        mode: 0600
+- name: Ensure Ansible facts directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    mode: 0600
+  loop:
+    - "{{ appliances_state_dir }}/ansible.facts.d"
+    - "/etc/ansible/facts.d"
+    
+- name: Write OpenHPC secrets
+  template:
+    src: openhpc_secrets.fact
+    dest: "{{ appliances_state_dir }}/ansible.facts.d/openhpc_secrets.fact"
+    owner: root
+    mode: 0600
   when: "not openhpc_secrets_stat.stat.exists"
-  
+
+- name: Symlink persistent facts to facts_path
+  file:
+    state: link
+    src: "{{ appliances_state_dir }}/ansible.facts.d/openhpc_secrets.fact"
+    dest: /etc/ansible/facts.d/openhpc_secrets.fact
+    owner: root
+    
 - name: Read facts
   ansible.builtin.setup:
-    fact_path: "{{ appliances_state_dir }}/ansible/facts.d"
     filter: ansible_local
