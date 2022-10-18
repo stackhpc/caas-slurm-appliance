@@ -27,7 +27,7 @@ parameters:
     immutable: true
     options:
       min_ram: 2048
-      min_disk: 10
+      min_disk: 20
   
   - name: home_volme_size
     label: Home volume size
@@ -35,7 +35,7 @@ parameters:
     kind: integer
     immutable: true
     options:
-      min: 1
+      min: 10
     default: 100
 
   - name: cluster_run_validation
