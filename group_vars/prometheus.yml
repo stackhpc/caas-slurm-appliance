@@ -6,3 +6,6 @@ openondemand_address: "{{ hostvars[groups['openondemand'].0].api_address if 'ope
 # Override group_var set in ansible-slurm-appliance all group - unless
 # OOD is being deployed then there won't be an OOD group
 prometheus_scrape_configs: "{{ prometheus_scrape_configs_default + (openondemand_scrape_configs if ( 'openondemand' in groups ) else [] ) }}"
+
+# Fix Prometheus storage retention size to 80% of state volume size
+prometheus_storage_retention_size: "{{ ( 0.8 * hostvars[groups['openstack']].state_volume_size ) | int ~ 'GB' }}"
