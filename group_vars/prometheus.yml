@@ -8,4 +8,4 @@ openondemand_address: "{{ hostvars[groups['openondemand'].0].api_address if 'ope
 prometheus_scrape_configs: "{{ prometheus_scrape_configs_default + (openondemand_scrape_configs if ( 'openondemand' in groups ) else [] ) }}"
 
 # Fix Prometheus storage retention size to 80% of state volume size
-prometheus_storage_retention_size: "{{ ( 0.8 * ( hostvars[groups['openstack']].state_volume_size | int ) ) | int ~ 'GB' }}"
+prometheus_storage_retention_size: "{{ ( 0.8 * ( cluster_state_volume_size | int ) ) | int ~ 'GB' }}"
