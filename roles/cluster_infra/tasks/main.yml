@@ -1,3 +1,9 @@
+- debug:
+    msg: |
+      terraform_backend_type: {{ terraform_backend_type }}
+      terraform_state: {{ terraform_state }}
+      cluster_upgrade_system_packages: {{ cluster_upgrade_system_packages | default('undefined') }}
+
 # We need to convert the floating IP id to an address for Terraform
 - name: Look up floating IP
   include_role:
