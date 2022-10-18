@@ -29,7 +29,7 @@ parameters:
       min_ram: 2048
       min_disk: 20
   
-  - name: home_volme_size
+  - name: home_volume_size
     label: Home volume size
     description: The size in GB of the volume to use for home directories
     kind: integer
