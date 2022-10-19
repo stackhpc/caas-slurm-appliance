@@ -75,7 +75,7 @@ resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_ingr
 resource "openstack_blockstorage_volume_v3" "state" {
     name = "{{ cluster_name }}-state"
     description = "State for control node"
-    size = "{{ cluster_state_volume_size }}"
+    size = "{{ state_volume_size }}"
 }
 
 resource "openstack_blockstorage_volume_v3" "home" {

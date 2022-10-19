@@ -7,5 +7,5 @@ openondemand_address: "{{ hostvars[groups['openondemand'].0].api_address if 'ope
 # OOD is being deployed then there won't be an OOD group
 prometheus_scrape_configs: "{{ prometheus_scrape_configs_default + (openondemand_scrape_configs if ( 'openondemand' in groups ) else [] ) }}"
 
-# Fix Prometheus storage retention size to 80% of state volume size
-prometheus_storage_retention_size: "{{ ( 0.8 * ( cluster_state_volume_size | int ) ) | int ~ 'GB' }}"
+# Set Prometheus storage retention size
+prometheus_storage_retention_size: "{{ metrics_db_maximum_size }}GB"
