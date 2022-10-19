@@ -81,7 +81,7 @@ resource "openstack_blockstorage_volume_v3" "state" {
 resource "openstack_blockstorage_volume_v3" "home" {
     name = "{{ cluster_name }}-home"
     description = "Home for control node"
-    size = "{{ home_volme_size }}"
+    size = "{{ home_volume_size }}"
 }
 
 
