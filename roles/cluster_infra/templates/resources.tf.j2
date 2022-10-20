@@ -81,7 +81,7 @@ resource "openstack_blockstorage_volume_v3" "state" {
 resource "openstack_blockstorage_volume_v3" "home" {
     name = "{{ cluster_name }}-home"
     description = "Home for control node"
-    size = "{{ home_volme_size }}"
+    size = "{{ home_volume_size }}"
 }
 
 
@@ -162,11 +162,11 @@ resource "openstack_compute_instance_v2" "control" {
     fs_setup:
       - label: state
         filesystem: ext4
-        device: /dev/vdb
+        device: {{ state_volume_device_path }}
         partition: auto
       - label: home
         filesystem: ext4
-        device: /dev/vdc
+        device: {{ home_volume_device_path }}
         partition: auto
     mounts:
         - [LABEL=state, /var/lib/state]
