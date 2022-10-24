@@ -2,7 +2,7 @@
 
 - name: Check if OpenHPC secrets exist in persistent storage
   stat:
-    path: "{{ appliances_state_dir }}/ansible/facts.d/openhpc_secrets.fact"
+    path: "{{ appliances_state_dir }}/ansible.facts.d/openhpc_secrets.fact"
   register: openhpc_secrets_stat
 
 - name: Ensure Ansible facts directories exist
