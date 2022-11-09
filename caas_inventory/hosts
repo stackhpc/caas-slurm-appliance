@@ -1,0 +1,24 @@
+[all:vars]
+# this block gets provided by azimuth:
+cluster_floating_ip=d91f644b-6476-4f46-a89f-261c33081e88
+terraform_project_path=/tmp/tf_project
+cluster_name=steverunner
+home_volume_size=10
+# openhpc-221027-1557.qcow2:
+cluster_image=4e56a3d4-96d4-47a5-b87f-1adf747d2d08
+# vm.alaska.cpu.general.small
+login_flavor=327b7a8b-8705-475b-b684-4f23f6a9e4c8
+control_flavor=327b7a8b-8705-475b-b684-4f23f6a9e4c8
+compute_flavor=327b7a8b-8705-475b-b684-4f23f6a9e4c8
+cluster_network=portal-internal
+# keypair with private 1/2 on localhost:
+cluster_deploy_ssh_public_key="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCdZmXFmIw/KtQIvXF7ZEeHFwyhHOl4T9C/j/euIEgcAfbxVgb5ORkLWgVVe87GLi16fK5FjFCcxXm+lP3jqCiaSHNgBqk4whNq+rFnyd9167nMHi0Y9iu2biUNe3jIXcRgkEkymRY0/+V+BF4kUJLpof2r+qXOvzL0OwSvKMPVZhdA/zKzbqsGlacmD3QEYZ89SSGXFhQDi+TElOMQH5Q0hQiEQaluFnM2QYeIGUv5tXuRyVVzdKoQ3hWlNv4vYnkFM8Ou0b5EKUFPit+oxpttqVHI8am9OZEkC2R+2O7NXkg+JqdZzwBAwJtSMtpejtId2nUOYaZCqvUXr0R4+qJMZeCvtHCggQA5JougqEfKPZxqBi/jM7u0iHSMciEXlT6qgqJu6CnyQJDiWTlHKL2RuO4scCjhQbutFvAsvF+StpDhjeOWCX/E1lgwuEYK8HHTlVr9yQJIB8U74vgLhJHep8zePJU3oCsFQWJTCk9WhSyQciDxJkENRJ8KfoIr5iU= slurm-app-ci@arcus.rcp-cloud-portal-demo.steveb-deploy"
+cluster_user_ssh_public_key="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDuNoaIV5Nw4HGblhFg6BOTpSlO+QZWxsZOtiaxR71CcP85+Sk8LQUY45L6gtO6n3swTLvkI96nTEQWjY7Cw2Z5WirO8Jctm0dYFtqU17jSkrgQymF7rHy/JCOVoIyLBlt/TJuTU5IRhw3Sd6HjAqvYstAV+8Bd1UWkzFQK/gUGx3SaqyWvKcINmSmszdS7+ZM/07Y9vXPW4MiJzWHQl1yqCEQ+QUttuYOxbNaHAwb9JOPgzsBnSFHW4skpCYKl4nsssE4um68Da7V0YFumwWXc/T6PBqwdMf2E2Ix/dFympzZGJA86mZFN6+NB2vvxKV7eY6BkKbbsinzQlCQT78AT steveb@DESKTOP-NSUK66K(base)"
+state_volume_path=/var/lib/state
+compute_count=2
+cluster_ssh_private_key_file=/home/rocky/.ssh/id_rsa
+metrics_db_maximum_size=10
+cluster_id=1
+
+[openstack]
+localhost ansible_connection=local ansible_python_interpreter="{{ ansible_playbook_python }}"

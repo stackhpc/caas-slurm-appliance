@@ -30,7 +30,7 @@
 
 # validate.yml asserts presence of a control group which doesn't exist when 
 # destroying infra, so only validate when we're not destroying
-- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/validate.yml
+- import_playbook: ../vendor/stackhpc/ansible-slurm-appliance/ansible/validate.yml
   when: cluster_state is not defined or (cluster_state is defined and cluster_state != "absent")
 
 # The first task in the bootstrap playbook causes the home directory of the rocky user to be moved on the first run
@@ -52,12 +52,12 @@
     - name: Reset persistent SSH connections
       meta: reset_connection
 
-- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/bootstrap.yml
-- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/filesystems.yml
-- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/slurm.yml
-- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/portal.yml
-- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/iam.yml
-- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/monitoring.yml
+- import_playbook: ../vendor/stackhpc/ansible-slurm-appliance/ansible/bootstrap.yml
+- import_playbook: ../vendor/stackhpc/ansible-slurm-appliance/ansible/filesystems.yml
+- import_playbook: ../vendor/stackhpc/ansible-slurm-appliance/ansible/slurm.yml
+- import_playbook: ../vendor/stackhpc/ansible-slurm-appliance/ansible/portal.yml
+- import_playbook: ../vendor/stackhpc/ansible-slurm-appliance/ansible/iam.yml
+- import_playbook: ../vendor/stackhpc/ansible-slurm-appliance/ansible/monitoring.yml
 
 # Configure the Zenith clients that are required
 # First, ensure that podman is installed on all hosts that will run Zenith clients
@@ -107,7 +107,7 @@
         zenith_proxy_mitm_auth_basic_password: "{{ vault_azimuth_user_password }}"
       when: zenith_subdomain_ood is defined
 
-- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/adhoc/hpctests.yml
+- import_playbook: ../vendor/stackhpc/ansible-slurm-appliance/ansible/adhoc/hpctests.yml
 
 # Write the outputs as the final task
 - hosts: localhost
