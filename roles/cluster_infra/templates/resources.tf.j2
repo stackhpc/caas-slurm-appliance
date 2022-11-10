@@ -105,12 +105,22 @@ resource "openstack_compute_instance_v2" "login" {
     "${openstack_networking_secgroup_v2.secgroup_slurm_cluster.name}",
     "${openstack_networking_secgroup_v2.secgroup_slurm_login.name}"
   ]
+
+  depends_on = [
+    openstack_compute_instance_v2.control
+  ]
+
   # Use cloud-init to inject the SSH keys
   user_data = <<-EOF
     #cloud-config
     ssh_authorized_keys:
       - {{ cluster_deploy_ssh_public_key }}
       - {{ cluster_user_ssh_public_key }}
+    {% if cluster_freeipa is defined and cluster_freeipa %}
+    manage_resolv_conf: true
+    nameservers:
+      - "${openstack_compute_instance_v2.control.network[0].fixed_ip_v4}"
+    {% endif %}
   EOF
 }
 
@@ -184,6 +194,11 @@ resource "openstack_compute_instance_v2" "compute" {
   network {
     name = "{{ cluster_network }}"
   }
+
+  depends_on = [
+    openstack_compute_instance_v2.control
+  ]
+
   security_groups = ["${openstack_networking_secgroup_v2.secgroup_slurm_cluster.name}"]
   # Use cloud-init to inject the SSH keys
   user_data = <<-EOF
@@ -191,6 +206,11 @@ resource "openstack_compute_instance_v2" "compute" {
     ssh_authorized_keys:
       - {{ cluster_deploy_ssh_public_key }}
       - {{ cluster_user_ssh_public_key }}
+    {% if cluster_freeipa is defined and cluster_freeipa %}
+    manage_resolv_conf: true
+    nameservers:
+      - "${openstack_compute_instance_v2.control.network[0].fixed_ip_v4}"
+    {% endif %}
   EOF
 }
 
@@ -202,3 +222,4 @@ resource "openstack_compute_floatingip_associate_v2" "login_floatingip_assoc" {
   floating_ip = "{{ cluster_floating_ip_address }}"
   instance_id = "${openstack_compute_instance_v2.login.id}"
 }
+
