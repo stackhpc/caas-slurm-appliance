@@ -1,2 +1,0 @@
-# Define path for persistent state on control node volume:
-appliances_state_dir: /var/lib/state

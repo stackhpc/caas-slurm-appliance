@@ -169,7 +169,7 @@ resource "openstack_compute_instance_v2" "control" {
         device: {{ home_volume_device_path }}
         partition: auto
     mounts:
-        - [LABEL=state, /var/lib/state]
+        - [LABEL=state, /var/lib/state, auto, "x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
         - [LABEL=home, /exports/home, auto, "x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
   EOF
 }

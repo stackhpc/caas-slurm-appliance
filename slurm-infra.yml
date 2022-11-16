@@ -69,10 +69,11 @@
     - import_role:
         name: podman
         tasks_from: config.yml
-# Deploy the Zenith client for Grafana
+
 - hosts: grafana
   tasks:
-    - include_role:
+    - name: Deploy the Zenith client for Grafana
+      include_role:
         name: zenith_proxy
       vars:
         zenith_proxy_service_name: zenith-monitoring
@@ -87,10 +88,11 @@
         zenith_proxy_mitm_auth_basic_username: "{{ grafana_security.admin_user }}"
         zenith_proxy_mitm_auth_basic_password: "{{ grafana_security.admin_password }}"
       when: zenith_subdomain_monitoring is defined
-# Deploy the Zenith client for OOD
+
 - hosts: openondemand
   tasks:
-    - include_role:
+    - name: Deploy the Zenith client for OOD
+      include_role:
         name: zenith_proxy
       vars:
         zenith_proxy_service_name: zenith-ood
