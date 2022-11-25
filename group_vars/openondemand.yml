@@ -1,5 +1,4 @@
 ---
-ondemand_package: ondemand-2.0.28
 openondemand_auth: basic_pam
 openondemand_jupyter_partition: "compute"
 openondemand_desktop_partition: "compute"
