@@ -162,11 +162,11 @@ resource "openstack_compute_instance_v2" "control" {
     fs_setup:
       - label: state
         filesystem: ext4
-        device: {{ state_volume_device_path }}
+        device: /dev/{{ block_device_prefix }}b
         partition: auto
       - label: home
         filesystem: ext4
-        device: {{ home_volume_device_path }}
+        device: /dev/{{ block_device_prefix }}c
         partition: auto
     mounts:
         - [LABEL=state, /var/lib/state, auto, "x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
