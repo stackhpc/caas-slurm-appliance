@@ -20,6 +20,13 @@
       loop_control:
         loop_var: host
 
+- name: Persist login hostkey across rebuilds
+  hosts: login
+  gather_facts: no
+  become: yes
+  roles:
+    - persist_hostkeys
+
 # Ensure that the secrets are generated and persisted on the control host
 - name: Generate and persist secrets
   hosts: control
