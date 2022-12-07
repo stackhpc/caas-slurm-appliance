@@ -20,13 +20,6 @@
       loop_control:
         loop_var: host
 
-- name: Persist login hostkey across rebuilds
-  hosts: login
-  gather_facts: no
-  become: yes
-  roles:
-    - persist_hostkeys
-
 # Ensure that the secrets are generated and persisted on the control host
 - name: Generate and persist secrets
   hosts: control
@@ -65,6 +58,14 @@
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/portal.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/iam.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/monitoring.yml
+
+- name: Persist login hostkey across rebuilds
+# Need NFS for this so can't do it before the appliance plays
+  hosts: login
+  gather_facts: no
+  become: yes
+  roles:
+    - persist_hostkeys
 
 # Configure the Zenith clients that are required
 # First, ensure that podman is installed on all hosts that will run Zenith clients
