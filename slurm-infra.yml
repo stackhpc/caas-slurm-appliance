@@ -59,6 +59,14 @@
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/iam.yml
 - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/monitoring.yml
 
+- name: Persist login hostkey across rebuilds
+# Need NFS for this so can't do it before the appliance plays
+  hosts: login
+  gather_facts: no
+  become: yes
+  roles:
+    - persist_hostkeys
+
 # Configure the Zenith clients that are required
 # First, ensure that podman is installed on all hosts that will run Zenith clients
 - hosts: zenith,!podman
@@ -69,10 +77,11 @@
     - import_role:
         name: podman
         tasks_from: config.yml
-# Deploy the Zenith client for Grafana
+
 - hosts: grafana
   tasks:
-    - include_role:
+    - name: Deploy the Zenith client for Grafana
+      include_role:
         name: zenith_proxy
       vars:
         zenith_proxy_service_name: zenith-monitoring
@@ -87,10 +96,11 @@
         zenith_proxy_mitm_auth_basic_username: "{{ grafana_security.admin_user }}"
         zenith_proxy_mitm_auth_basic_password: "{{ grafana_security.admin_password }}"
       when: zenith_subdomain_monitoring is defined
-# Deploy the Zenith client for OOD
+
 - hosts: openondemand
   tasks:
-    - include_role:
+    - name: Deploy the Zenith client for OOD
+      include_role:
         name: zenith_proxy
       vars:
         zenith_proxy_service_name: zenith-ood

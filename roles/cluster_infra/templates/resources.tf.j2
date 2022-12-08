@@ -91,7 +91,7 @@ resource "openstack_blockstorage_volume_v3" "home" {
 
 resource "openstack_compute_instance_v2" "login" {
   name      = "{{ cluster_name }}-login-0"
-  image_id  = "{{ cluster_image }}"
+  image_id  = "{{ cluster_previous_image | default(cluster_image) }}"
   {% if login_flavor_name is defined %}
   flavor_name = "{{ login_flavor_name }}"
   {% else %}
@@ -116,7 +116,7 @@ resource "openstack_compute_instance_v2" "login" {
 
 resource "openstack_compute_instance_v2" "control" {
   name      = "{{ cluster_name }}-control-0"
-  image_id  = "{{ cluster_image }}"
+  image_id  = "{{ cluster_previous_image | default(cluster_image) }}"
   {% if control_flavor_name is defined %}
   flavor_name = "{{ control_flavor_name }}"
   {% else %}
@@ -169,7 +169,7 @@ resource "openstack_compute_instance_v2" "control" {
         device: /dev/{{ block_device_prefix }}c
         partition: auto
     mounts:
-        - [LABEL=state, /var/lib/state]
+        - [LABEL=state, /var/lib/state, auto, "x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
         - [LABEL=home, /exports/home, auto, "x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
   EOF
 }
@@ -178,7 +178,7 @@ resource "openstack_compute_instance_v2" "compute" {
   count = {{ compute_count }}
 
   name      = "{{ cluster_name }}-compute-${count.index}"
-  image_id  = "{{ cluster_image }}"
+  image_id  = "{{ cluster_previous_image | default(cluster_image) }}"
   flavor_id = "{{ compute_flavor }}"
 
   network {

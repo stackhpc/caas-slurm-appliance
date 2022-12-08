@@ -73,5 +73,3 @@ _opeonondemand_unset_auth: '    RequestHeader unset Authorization'
 
 # Fix grafana proxying for basic auth if anonymous grafana access enabled:
 openondemand_node_proxy_directives: "{{ _opeonondemand_unset_auth if (openondemand_auth == 'basic_pam' and 'openondemand_host_regex' and 'grafana' in groups and hostvars[groups['grafana'][0]]._grafana_auth_is_anonymous) else '' }}"
-
-
