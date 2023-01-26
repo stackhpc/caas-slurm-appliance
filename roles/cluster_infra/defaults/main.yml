@@ -27,7 +27,7 @@ cluster_groups_required:
 
 # These are the additional groups required for monitoring (see everything layout)
 cluster_groups_monitoring:
-  podman:        [opensearch, filebeat]
+  podman:        [opensearch, filebeat, mysql]
   prometheus:    [control]
   grafana:       [control]
   alertmanager:  [control]
