@@ -82,6 +82,9 @@ resource "openstack_blockstorage_volume_v3" "home" {
     name = "{{ cluster_name }}-home"
     description = "Home for control node"
     size = "{{ home_volume_size }}"
+    {% if use_home_volume_type_fast and home_volume_type_fast is defined %}
+    volume_type = "{{ home_volume_type_fast }}"
+    {% endif %}
 }
 
 
