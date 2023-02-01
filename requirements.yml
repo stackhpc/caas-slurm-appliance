@@ -35,6 +35,7 @@ collections:
   - name: community.mysql
 
   - name: openstack.cloud
+    version: 1.10.0
   - name: https://github.com/stackhpc/ansible-collection-terraform
     type: git
     version: 75fb75132bbc77e3e78a05ba674458131da2b1dd
