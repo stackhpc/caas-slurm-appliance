@@ -130,7 +130,7 @@ resource "openstack_compute_instance_v2" "control" {
 
   # root device:
   block_device {
-      uuid = "{{ cluster_image }}"
+      uuid = "{{ cluster_previous_image | default(cluster_image) }}"
       source_type  = "image"
       destination_type = "local"
       boot_index = 0
