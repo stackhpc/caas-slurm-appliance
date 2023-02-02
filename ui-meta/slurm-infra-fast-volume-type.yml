@@ -42,12 +42,10 @@ parameters:
     label: Provision high-performance storage for home directories
     description: |
       If a high-performance storage type is available to the Slurm platform,
-      use it for cluster home directories. If no high-performance storage type
-      is available, this option has no effect and a standard cloud volume will
-      be provisioned for home directories.
+      use it for cluster home directories.
     kind: boolean
     required: false
-    default: true
+    default: false
     options:
       checkboxLabel: Put home directories on high-performance storage?
 
