@@ -23,16 +23,16 @@ cluster_groups_required:
   # ignore these for the moment:
   #etc_hosts:     []
   # cloud_init:   [etc_hosts]
-  systemd:        [opendistro, grafana, control, prometheus]
+  systemd:        [opensearch, grafana, control, prometheus]
 
 # These are the additional groups required for monitoring (see everything layout)
 cluster_groups_monitoring:
-  podman:        [opendistro, filebeat]
+  podman:        [opensearch, filebeat, mysql]
   prometheus:    [control]
   grafana:       [control]
   alertmanager:  [control]
   node_exporter: [cluster]
-  opendistro:    [control]
+  opensearch:    [control]
   slurm_stats:   [control]
   filebeat:      [slurm_stats]
 

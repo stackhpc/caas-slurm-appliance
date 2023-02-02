@@ -8,8 +8,6 @@ roles:
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: feature/no-install
     name: cloudalchemy.node_exporter
-  - src: cloudalchemy.blackbox-exporter
-    version: 1.0.0
   - src: https://github.com/cloudalchemy/ansible-prometheus.git
     version: 4d2c8d742de39e50387e0aa6d5510b21c7451343 # need fix in preceeding commit for rocky
     name: cloudalchemy.prometheus
@@ -18,8 +16,6 @@ roles:
   - src: https://github.com/stackhpc/ansible-grafana.git
     name: cloudalchemy.grafana
     version: service-state
-  - src: jriguera.configdrive
-  # No versions available
   - src: https://github.com/stackhpc/ood-ansible.git
     name: osc.ood
     version: shpc/releasever # based on v2.0.8
@@ -34,10 +30,12 @@ collections:
   - name: ansible.netcommon
   - name: community.general
     version: 4.5.0  # https://github.com/ansible-collections/community.general/pull/4281
-
+  - name: community.crypto
+    version: 2.10.0
   - name: community.mysql
 
   - name: openstack.cloud
+    version: 1.10.0
   - name: https://github.com/stackhpc/ansible-collection-terraform
     type: git
     version: 75fb75132bbc77e3e78a05ba674458131da2b1dd
