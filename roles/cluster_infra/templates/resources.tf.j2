@@ -179,16 +179,18 @@ resource "openstack_compute_instance_v2" "control" {
   EOF
 }
 
-resource "openstack_compute_instance_v2" "compute" {
-  count = {{ compute_count }}
+{% for partition in openhpc_slurm_partitions %}
+resource "openstack_compute_instance_v2" "{{ partition.name }}" {
+  count = {{ partition.count }}
 
-  name      = "{{ cluster_name }}-compute-${count.index}"
+  name      = "{{ cluster_name }}-compute-{{ partition.name }}-${count.index}"
   image_id  = "{{ cluster_previous_image | default(cluster_image) }}"
-  flavor_id = "{{ compute_flavor }}"
+  flavor_name = "{{ partition.flavor_name }}"
 
   network {
     name = "{{ cluster_network }}"
   }
+
   security_groups = ["${openstack_networking_secgroup_v2.secgroup_slurm_cluster.name}"]
   # Use cloud-init to inject the SSH keys
   user_data = <<-EOF
@@ -198,6 +200,7 @@ resource "openstack_compute_instance_v2" "compute" {
       - {{ cluster_user_ssh_public_key }}
   EOF
 }
+{% endfor %}
 
 #####
 ##### Floating IP association for login node
