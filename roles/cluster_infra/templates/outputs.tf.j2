@@ -1,6 +1,6 @@
 output "cluster_gateway_ip" {
   description = "The IP address of the gateway used to contact the cluster nodes"
-  value       = "{{ cluster_floating_ip_address }}"
+  value       =  openstack_compute_floatingip_associate_v2.login_floatingip_assoc.floating_ip
 }
 
 output "cluster_nodes" {
