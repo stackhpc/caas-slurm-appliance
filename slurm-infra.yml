@@ -128,10 +128,10 @@
         # so we have to repeat logic here unfortunately
         outputs: >-
           {{-
-            { "cluster_access_ip": hostvars[groups['openstack'][0]].cluster_floating_ip_address } |
+            { "cluster_access_ip": hostvars[groups['openstack'][0]].cluster_gateway_ip } |
               combine(
                 {
-                  "openondemand_url": "https://" ~ (hostvars[groups['openstack'][0]].cluster_floating_ip_address | replace('.', '-')) ~ ".sslip.io",
+                  "openondemand_url": "https://" ~ (hostvars[groups['openstack'][0]].cluster_gateway_ip | replace('.', '-')) ~ ".sslip.io",
                   "azimuth_user_password": hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_azimuth_user_password
                 }
                 if zenith_fqdn_ood is not defined
