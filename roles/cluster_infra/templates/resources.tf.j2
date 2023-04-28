@@ -1,3 +1,4 @@
+#jinja2: trim_blocks:False
 #####
 ##### The identity scope we are operating in
 ##### Used to output the OpenStack project ID as a fact for provisioned hosts
@@ -233,6 +234,14 @@ resource "openstack_networking_port_v2" "{{ partition.name }}" {
 
 {% endfor %}
 
+#####
+##### Deploy key
+#####
+{% if cluster_ssh_private_key_file is not defined %}
+resource "openstack_compute_keypair_v2" "cluster_keypair" {
+  name = "{{ cluster_name }}-deploy-key"
+}
+{% endif %}
 
 #####
 ##### Cluster nodes
@@ -255,8 +264,12 @@ resource "openstack_compute_instance_v2" "login" {
   user_data = <<-EOF
     #cloud-config
     ssh_authorized_keys:
-      - {{ cluster_deploy_ssh_public_key }}
-      - {{ cluster_user_ssh_public_key }}
+    {%- if cluster_ssh_private_key_file is not defined %}
+      - "${openstack_compute_keypair_v2.cluster_keypair.public_key}"
+    {%- endif %}
+    {%- for ssh_key in cluster_deploy_ssh_keys %}
+      - {{ ssh_key }}
+    {%- endfor %}
   EOF
 }
 
@@ -302,8 +315,12 @@ resource "openstack_compute_instance_v2" "control" {
   user_data = <<-EOF
     #cloud-config
     ssh_authorized_keys:
-      - {{ cluster_deploy_ssh_public_key }}
-      - {{ cluster_user_ssh_public_key }}
+    {%- if cluster_ssh_private_key_file is not defined %}
+      - "${openstack_compute_keypair_v2.cluster_keypair.public_key}"
+    {%- endif %}
+    {%- for ssh_key in cluster_deploy_ssh_keys %}
+      - {{ ssh_key }}
+    {%- endfor %}
     fs_setup:
       - label: state
         filesystem: ext4
@@ -335,10 +352,15 @@ resource "openstack_compute_instance_v2" "{{ partition.name }}" {
   user_data = <<-EOF
     #cloud-config
     ssh_authorized_keys:
-      - {{ cluster_deploy_ssh_public_key }}
-      - {{ cluster_user_ssh_public_key }}
+    {%- if cluster_ssh_private_key_file is not defined %}
+      - "${openstack_compute_keypair_v2.cluster_keypair.public_key}"
+    {%- endif %}
+    {%- for ssh_key in cluster_deploy_ssh_keys %}
+      - {{ ssh_key }}
+    {%- endfor %}
   EOF
 }
+
 {% endfor %}
 
 #####

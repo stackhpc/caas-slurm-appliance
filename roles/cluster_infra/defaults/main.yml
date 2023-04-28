@@ -50,3 +50,12 @@ cluster_groups_validation:
 cluster_groups_zenith:
   # Any hosts in the grafana and openondemand groups should go in the zenith group
   zenith: [grafana, openondemand]
+
+# Deploy user SSH keys
+cluster_deploy_ssh_keys: >-
+  {{
+     cluster_deploy_ssh_additional_public_keys | default([]) +
+     ( [cluster_deploy_ssh_public_key]
+     if cluster_deploy_ssh_public_key is defined
+     else [] )
+  }}
