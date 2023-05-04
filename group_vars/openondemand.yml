@@ -1,14 +1,14 @@
 ---
 openondemand_auth: basic_pam
-openondemand_jupyter_partition: "compute"
-openondemand_desktop_partition: "compute"
+openondemand_jupyter_partition: "{{ openhpc_slurm_partitions[0]['name'] }}"
+openondemand_desktop_partition: "{{ openhpc_slurm_partitions[0]['name'] }}"
 
 httpd_listen_addr_port:
   - 80
   - 443
 
 # Allow proxying to compute nodes for apps and control for monitoring only when the grafana group is available
-openondemand_host_regex: '({{ openhpc_cluster_name ~ "-compute-\d+)" ~ ( "|(" ~ groups["grafana"][0] ~ ")" if "grafana" in groups else "" ) }}'
+openondemand_host_regex: "{{ (groups['compute'] + groups['grafana']) | to_ood_regex }}"
 
 # Add grafana to dashboard links to OOD only if grafana group is available
 openondemand_dashboard_links_grafana:
