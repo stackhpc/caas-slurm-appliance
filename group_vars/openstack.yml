@@ -19,4 +19,3 @@ cluster_ssh_user: rocky
 
 # Set the size of the state volume to metrics_db_maximum_size + 10
 state_volume_size: "{{ metrics_db_maximum_size + 10 }}"
-block_device_prefix: 'vd'
