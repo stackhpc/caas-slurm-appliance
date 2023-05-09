@@ -1,10 +1,18 @@
-.ansible
-.bin
-.terraform
-.terraform.lock.hcl
-*.tfstate*
-.python-version
-inventory.*
+# -- from caas --
+# .ansible
+# .bin
+# .terraform
+# .terraform.lock.hcl
+# .python-version
+# inventory.*
 __pycache__
-terraform/backend.tf
-inventory
+# terraform/backend.tf
+# inventory
+
+# -- from slurmapp-env --
+terraform.tfstate*
+# .terraform
+# config-drive.iso
+venv
+*.pyc
+.vscode
