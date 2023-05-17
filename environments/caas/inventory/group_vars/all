@@ -1,1 +1,1 @@
-../../../common/inventory/group_vars/all/
+../vendor/stackhpc/ansible-slurm-appliance/environments/common/inventory/group_vars/all
