@@ -18,6 +18,5 @@ class VarsModule(HostGroupVarsModule):
     """
     Custom vars plugin that always reads host and group vars from the current working directory.
     """
-    INVENTORY_PATH = 'environments/caas/inventory/'
     def get_vars(self, loader, path, entities, cache = True):
-        return super().get_vars(loader, os.path.join(os.getcwd(), INVENTORY_PATH), entities, cache)
+        return super().get_vars(loader, os.getcwd(), entities, cache)
