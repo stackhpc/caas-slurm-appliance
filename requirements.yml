@@ -34,7 +34,7 @@ collections:
   - name: ansible.posix
   - name: ansible.netcommon
   - name: community.general
-    version: '>=4.5.0'  # https://github.com/ansible-collections/community.general/pull/4281
+    version: 4.5.0  # https://github.com/ansible-collections/community.general/pull/4281
   - name: community.crypto
     version: 2.10.0
   - name: community.mysql
