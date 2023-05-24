@@ -260,6 +260,23 @@ resource "openstack_compute_instance_v2" "login" {
     port = "${openstack_networking_port_v2.login.id}"
   }
 
+  # root device:
+  block_device {
+      uuid = "{{ cluster_previous_image | default(cluster_image) }}"
+      source_type  = "image"
+      {% if cluster_use_root_volumes is defined and cluster_use_root_volumes %}
+      volume_size = {{ cluster_root_volume_size | default("20") }}
+      destination_type = "volume"
+      {% if cluster_root_volume_type is defined %}
+      volume_type = "{{ cluster_root_volume_type }}"
+      {% endif %}
+      {% else %}
+      destination_type = "local"
+      {% endif %}
+      boot_index = 0
+      delete_on_termination = true
+  }
+
   # Use cloud-init to inject the SSH keys
   user_data = <<-EOF
     #cloud-config
@@ -296,7 +313,15 @@ resource "openstack_compute_instance_v2" "control" {
   block_device {
       uuid = "{{ cluster_previous_image | default(cluster_image) }}"
       source_type  = "image"
+      {% if cluster_use_root_volumes is defined and cluster_use_root_volumes %}
+      volume_size = {{ cluster_root_volume_size | default("20") }}
+      destination_type = "volume"
+      {% if cluster_root_volume_type is defined %}
+      volume_type = "{{ cluster_root_volume_type }}"
+      {% endif %}
+      {% else %}
       destination_type = "local"
+      {% endif %}
       boot_index = 0
       delete_on_termination = true
   }
@@ -358,6 +383,23 @@ resource "openstack_compute_instance_v2" "{{ partition.name }}" {
 
   network {
     port = openstack_networking_port_v2.{{ partition.name }}[count.index].id
+  }
+
+  # root device:
+  block_device {
+      uuid = "{{ cluster_previous_image | default(cluster_image) }}"
+      source_type  = "image"
+      {% if cluster_use_root_volumes is defined and cluster_use_root_volumes %}
+      volume_size = {{ cluster_root_volume_size | default("20") }}
+      destination_type = "volume"
+      {% if cluster_root_volume_type is defined %}
+      volume_type = "{{ cluster_root_volume_type }}"
+      {% endif %}
+      {% else %}
+      destination_type = "local"
+      {% endif %}
+      boot_index = 0
+      delete_on_termination = true
   }
 
   # Use cloud-init to inject the SSH keys
