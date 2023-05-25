@@ -3,7 +3,7 @@ roles:
   - src: stackhpc.nfs
     version: v22.9.1
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
-    version: v0.18.0 # requires/uses openhpc v2.6.1
+    version: v0.20.0 # Allow multiple empty partitions by @sjpb in #156
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: feature/no-install
@@ -33,8 +33,6 @@ collections:
     version: 4.5.0  # https://github.com/ansible-collections/community.general/pull/4281
   - name: community.crypto
     version: 2.10.0
-  - name: community.mysql
-
   - name: openstack.cloud
     version: 1.10.0
   - name: https://github.com/stackhpc/ansible-collection-terraform
