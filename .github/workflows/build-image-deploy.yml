@@ -127,4 +127,4 @@ jobs:
         with:
           name: packer-build-log
           path: ${{ github.workspace }}/packer-build.log
-        if: failure() || success()
+        if: failure() || success() || cancelled()
