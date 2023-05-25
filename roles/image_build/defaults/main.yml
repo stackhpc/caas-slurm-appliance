@@ -14,6 +14,9 @@ image_build_metadata: {}
 # The directory that contains the openstack.pkr.hcl to build the Slurm image
 image_build_packer_root_path: "{{ playbook_dir }}/vendor/stackhpc/ansible-slurm-appliance/packer"
 
+# Extra args to pass to the packer build command
+image_build_packer_extra_args: ""
+
 # Vars to apply to the builder group
 image_build_builder_group_vars:
   update_log_path: /tmp/update_log
