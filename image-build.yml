@@ -1,0 +1,24 @@
+---
+- name: Build image
+  hosts: openstack
+  tasks:
+    - name: Manage image build infra
+      include_role:
+        name: image_build_infra
+      when:
+        - image_build_manage_infra is defined
+        - image_build_manage_infra
+
+    - block:
+      - name: Build fat image
+        include_role:
+          name: image_build
+
+      - name: Set cluster_image fact
+        set_fact:
+          cluster_image: "{{ image_build_data.artifact_id }}"
+
+      - name: Print cluster_image UUID
+        debug:
+          msg: "{{ cluster_image }}"
+      when: cluster_state is not defined or (cluster_state is defined and cluster_state != "absent")

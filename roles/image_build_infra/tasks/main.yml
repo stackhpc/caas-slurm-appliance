@@ -1,0 +1,23 @@
+---
+- name: Get path to the image-buid Terraform templates directory
+  set_fact:
+    image_build_terraform_template_dir: "{{ role_path }}/templates"
+
+- name: Run cluster_infra role with image-build terraform template
+  include_role:
+    name: cluster_infra
+    public: true
+  vars:
+    cluster_id: "{{ image_build_cluster_id }}"
+    cluster_name: "{{ image_build_cluster_id }}"
+    cluster_terraform_template_dir: "{{ image_build_terraform_template_dir }}"
+    terraform_project_path: "{{ image_build_terraform_project_path }}"
+
+- name: Set image build infrastructure facts
+  set_fact:
+    image_build_network_id: "{{ terraform_provision.outputs.network_id.value }}"
+    image_build_floating_ip_network: "{{ terraform_provision.outputs.floating_ip_network_id.value }}"
+    image_build_source_image_id: "{{ terraform_provision.outputs.source_image_name.value.ids | first }}"
+    image_build_security_group_id: "{{ terraform_provision.outputs.security_group_id.value }}"
+  when: cluster_state is not defined or (cluster_state is defined and cluster_state != "absent")
+
