@@ -1,7 +1,7 @@
 ---
 
 image_build_terraform_project_path: "{{ playbook_dir }}/terraform-caas-image-build"
-image_build_cluster_id: "caas-image-build"
+image_build_cluster_name: "caas-image-build"
 
 # Regex to capture existing cloud image names to use as the
 # OpenHPC Slurm base-image
