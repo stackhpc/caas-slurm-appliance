@@ -8,15 +8,16 @@ data "openstack_networking_network_v2" "caas_image_build_external_network" {
   external = true
 }
 
+{% if image_build_network_id is not defined %}
 {% if image_build_network_name is not defined %}
 # Create a network
 resource "openstack_networking_network_v2" "caas_image_build_network" {
-  name           = "{{ image_build_cluster_id }}"
+  name           = "{{ image_build_cluster_name }}"
   admin_state_up = "true"
 }
 
 resource "openstack_networking_subnet_v2" "caas_image_build_subnet" {
-  name       = "{{ image_build_cluster_id }}"
+  name       = "{{ image_build_cluster_name }}"
   network_id = "${openstack_networking_network_v2.caas_image_build_network.id}"
   cidr       = "192.168.244.0/24"
   {% if image_build_nameservers is defined %}
@@ -30,7 +31,7 @@ resource "openstack_networking_subnet_v2" "caas_image_build_subnet" {
 }
 
 resource "openstack_networking_router_v2" "caas_image_build_router" {
-  name                = "{{ image_build_cluster_id }}"
+  name                = "{{ image_build_cluster_name }}"
   admin_state_up      = true
   external_network_id = "${data.openstack_networking_network_v2.caas_image_build_external_network.id}"
 }
@@ -40,17 +41,21 @@ resource "openstack_networking_router_interface_v2" "caas_image_build_router_int
   subnet_id = "${openstack_networking_subnet_v2.caas_image_build_subnet.id}"
 }
 {% endif %}
+{% endif %}
 
 # Get existing network resource data by name, from either the created
 # network or the network name if supplied
 data "openstack_networking_network_v2" "caas_image_build_network" {
-  {% if image_build_network_name is not defined %}
-  network_id = "${openstack_networking_network_v2.caas_image_build_network.id}"
-  {% else %}
+  {% if image_build_network_id is defined %}
+  network_id = "{{ image_build_network_id }}"
+  {% elif image_build_network_name is defined %}
   name = "{{ image_build_network_name }}"
+  {% else %}
+  network_id = "${openstack_networking_network_v2.caas_image_build_network.id}"  
   {% endif %}
 }
 
+{% if image_build_source_image_id is not defined %}
 ######
 ###### Image build base image
 ######
@@ -59,14 +64,16 @@ data "openstack_images_image_ids_v2" "image_build_source_image" {
   name_regex = "{{ image_build_existing_image_regex }}"
   sort       = "{{ image_build_existing_image_sort_attributes }}"
 }
+{% endif %}
 
+{% if image_build_security_group_id is not defined %}
 ######
 ###### Image build security groups
 ######
 
 # Security group to hold specific rules for the image build instance
 resource "openstack_networking_secgroup_v2" "caas_image_build_secgroup" {
-  name                 = "{{ image_build_cluster_id }}"
+  name                 = "{{ image_build_cluster_name }}"
   description          = "Specific rules for caas image build"
   delete_default_rules = true   # Fully manage with terraform
 }
@@ -87,3 +94,4 @@ resource "openstack_networking_secgroup_rule_v2" "caas_image_build_secgroup_ingr
   port_range_max    = 22
   security_group_id = "${openstack_networking_secgroup_v2.caas_image_build_secgroup.id}"
 }
+{% endif %}
