@@ -21,6 +21,7 @@ jobs:
     concurrency: ${{ github.ref }}
     runs-on: ubuntu-20.04
     env:
+      PACKER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       OS_CLIENT_CONFIG_FILE: ${{ github.workspace }}/clouds.yaml
