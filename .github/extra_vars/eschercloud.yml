@@ -1,0 +1,36 @@
+# Cluster instance vars
+cluster_id: "{{ cluster_name }}"
+openhpc_slurm_partitions:
+  - name: "small"
+    count: 2
+    flavor_name: "g.2.standard"
+    default: "YES"
+  - name: "medium"
+    count: 1
+    flavor_name: "g.4.standard"
+cluster_run_validation: true
+cluster_use_root_volumes: true
+cluster_user_ssh_public_key: ""
+cluster_network: ohpc-int
+home_volume_size: 20
+
+# Cloud vars
+cluster_external_network: "Internet"
+login_flavor_name: "g.2.standard"
+control_flavor_name: "g.2.standard"
+metrics_db_maximum_size: 5
+
+# Image build
+image_build_manage_infra: true
+image_build_network_name: "{{ cluster_network }}"
+image_build_flavor_name: "g.2.standard"
+image_build_use_blockstorage_volume: true
+image_build_attach_floating_ip: true
+image_build_image_disk_format: "raw"
+image_build_volume_size: 10
+image_build_metadata:
+  hw_scsi_model: virtio-scsi
+  hw_disk_bus: scsi
+  hw_vif_multiqueue_enabled: "yes"
+  hw_qemu_guest_agent: "yes"
+  os_require_quiesce: "yes"
