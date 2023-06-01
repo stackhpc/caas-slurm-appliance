@@ -50,7 +50,7 @@ jobs:
           -i image-build/hosts \
           -e @${EXTRA_VARS_FILE} \
           -e '{"write_cluster_image_uuid_file": true}' \
-          -e image_build_cluster_id="image-build-${GITHUB_SHA::7}" \
+          -e image_build_cluster_name="image-build-${GITHUB_SHA::7}" \
           image-build.yml
           echo "CLUSTER_IMAGE=$(cat cluster_image_uuid.txt)" >> $GITHUB_OUTPUT
         env:
@@ -63,7 +63,7 @@ jobs:
           -i image-build/hosts \
           -e @${EXTRA_VARS_FILE} \
           -e cluster_state=absent \
-          -e image_build_cluster_id="image-build-${GITHUB_SHA::7}" \
+          -e image_build_cluster_name="image-build-${GITHUB_SHA::7}" \
           image-build.yml
         if: always()
 
