@@ -1,6 +1,9 @@
 repo_root = "{{ playbook_dir }}/vendor/stackhpc/ansible-slurm-appliance"
 environment_root = "{{ playbook_dir }}/image_build"
 networks = ["{{ image_build_network_id }}"]
+{% if image_build_ssh_username is defined %}
+ssh_username = "{{ image_build_ssh_username }}"
+{% endif %}
 {% if image_build_ssh_bastion_host is defined %}
 ssh_bastion_host = "{{ image_build_ssh_bastion_host }}"
 {% endif %}
