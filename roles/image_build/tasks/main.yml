@@ -36,6 +36,9 @@
   copy:
     dest: "{{ image_build_inventory.path }}/hosts"
     content: |
+      {% raw %}
+      localhost ansible_connection=local ansible_python_interpreter="{{ ansible_playbook_python }}"
+      {% endraw %}
       [builder:vars]
       {% if image_build_ssh_bastion_host is defined %}
       ansible_ssh_common_args={{ image_build_ansible_ssh_common_args }}
