@@ -73,8 +73,9 @@
               else 'vd'
            }}
   # Only run when block_device_prefix isn't set as an extravar
-  when: block_device_prefix is not defined
-
+  when:
+    - block_device_prefix is not defined
+    - cluster_image is defined
 
 - name: Template Terraform files into project directory
   template:
