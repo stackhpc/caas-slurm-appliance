@@ -6,7 +6,7 @@ roles:
     version: v0.20.0 # Allow multiple empty partitions by @sjpb in #156
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
-    version: feature/no-install
+    version: 62dd0e1534ad54d770e541491ee9570bbcb3f698 # feature/no-install
     name: cloudalchemy.node_exporter
   - src: https://github.com/cloudalchemy/ansible-prometheus.git
     version: 4d2c8d742de39e50387e0aa6d5510b21c7451343 # need fix in preceeding commit for rocky
@@ -15,7 +15,7 @@ roles:
     version: 0.19.1
   - src: https://github.com/stackhpc/ansible-grafana.git
     name: cloudalchemy.grafana
-    version: service-state
+    version: 27b57570400deda29dbe32ddcb07558f4e957e4e # service-state
     # No versions available
   - src: https://github.com/OSC/ood-ansible.git
     name: osc.ood
@@ -23,19 +23,22 @@ roles:
 
 collections:
   - name: containers.podman
+    version: 1.10.2
   - name: community.grafana
+    version: 1.5.4
   - name: https://github.com/stackhpc/ansible_collection_slurm_openstack_tools
     type: git
     version: v0.2.0
   - name: ansible.posix
+    version: 1.5.4
   - name: ansible.netcommon
+    version: 5.1.1
   - name: community.general
-    version: 4.5.0  # https://github.com/ansible-collections/community.general/pull/4281
+    version: 7.1.0
   - name: community.crypto
     version: 2.10.0
   - name: openstack.cloud
-    version: 1.10.0
+    version: 2.1.0
   - name: https://github.com/stackhpc/ansible-collection-terraform
     type: git
     version: dadf2e81b78cfd267821c568f92d3a8da6541a41
-
