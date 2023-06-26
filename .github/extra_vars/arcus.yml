@@ -1,0 +1,35 @@
+# Cluster instance vars
+cluster_id: "{{ cluster_name }}"
+openhpc_slurm_partitions:
+  - name: "small"
+    count: 2
+    flavor_name: "vm.ska.cpu.general.small"
+    default: "YES"
+cluster_run_validation: true
+cluster_user_ssh_public_key: ""
+home_volume_size: 20
+cluster_use_root_volumes: true
+
+# Cloud vars
+cluster_external_network: "CUDN-Internet"
+login_flavor_name: "vm.ska.cpu.general.small"
+control_flavor_name: "vm.ska.cpu.general.small"
+metrics_db_maximum_size: 5
+
+# Image build
+image_build_manage_infra: false
+image_build_use_blockstorage_volume: true
+image_build_image_disk_format: "raw"
+image_build_volume_size: 10
+image_build_metadata:
+  hw_vif_multiqueue_enabled: "yes"
+  hw_scsi_model: "virtio-scsi"
+  hw_disk_bus: "scsi"
+  hw_qemu_guest_agent: "yes"
+  os_require_quiesce: "yes"
+image_build_flavor_name: "vm.ska.cpu.general.small"
+image_build_network_id: "4b6b2722-ee5b-40ec-8e52-a6610e14cc51"
+image_build_attach_floating_ip: true
+image_build_floating_ip_network: "CUDN-Internet"
+image_build_source_image_id: "2a77064b-be40-4065-b0f4-4d5417a4460a"
+image_build_security_group_id: "486dfc85-099b-4bbb-9375-60f320a7de18"

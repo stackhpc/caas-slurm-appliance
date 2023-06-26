@@ -67,7 +67,7 @@
 - name: Build image with packer
   command:
     cmd: |
-      packer build -only openstack.openhpc -var-file={{ pkrvars_hcl_file.path }} openstack.pkr.hcl
+      packer build {{ image_build_packer_extra_args }} -only openstack.openhpc -var-file={{ pkrvars_hcl_file.path }} openstack.pkr.hcl
     chdir: "{{ image_build_packer_root_path }}"
   environment:
     APPLIANCES_ENVIRONMENT_ROOT: "{{ image_build_appliances_environment_root }}"

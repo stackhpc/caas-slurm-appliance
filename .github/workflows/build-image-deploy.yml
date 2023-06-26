@@ -1,0 +1,131 @@
+
+name: Build, deploy and promote a new OHPC image
+on:
+  workflow_dispatch:
+    inputs:
+      promote_community:
+        description: 'Set the community property on a successfully tested image'
+        required: true
+        default: false
+        type: boolean
+  pull_request:
+  push:
+    branches:    
+      - main
+    tags:
+      - '*'
+jobs:
+  build-deploy-promote:
+    name: Build, deploy and promote a new OHPC image
+    if: github.repository == 'stackhpc/caas-slurm-appliance'
+    concurrency: ${{ github.ref }}
+    runs-on: ubuntu-20.04
+    env:
+      PACKER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      ANSIBLE_FORCE_COLOR: True
+      OS_CLOUD: openstack
+      OS_CLIENT_CONFIG_FILE: ${{ github.workspace }}/clouds.yaml
+      EXTRA_VARS_FILE: .github/extra_vars/arcus.yml
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Install ansible etc
+        run: dev/setup-env.sh
+
+      - name: Write clouds.yaml
+        run: |
+          echo "${CLOUDS_YAML}" > ${OS_CLIENT_CONFIG_FILE}
+        shell: bash
+        env:
+          CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
+
+      - name: Build OHPC image
+        id: build
+        run: |
+          source venv/bin/activate
+          ansible-playbook \
+          -i image-build/hosts \
+          -e @${EXTRA_VARS_FILE} \
+          -e '{"write_cluster_image_uuid_file": true}' \
+          -e image_build_cluster_name="image-build-${GITHUB_SHA::7}" \
+          image-build.yml
+          echo "CLUSTER_IMAGE=$(cat cluster_image_uuid.txt)" >> $GITHUB_OUTPUT
+        env:
+          PACKER_LOG_PATH: ${{ github.workspace }}/packer-build.log
+
+      - name: Remove image build infra
+        run: |
+          source venv/bin/activate
+          ansible-playbook \
+          -i image-build/hosts \
+          -e @${EXTRA_VARS_FILE} \
+          -e cluster_state=absent \
+          -e image_build_cluster_name="image-build-${GITHUB_SHA::7}" \
+          image-build.yml
+        if: always()
+
+      - name: Deploy a cluster based on the new OPHC image
+        id: deploy
+        run: |
+          source venv/bin/activate
+          ansible-playbook \
+          -i image-build/hosts \
+          -e @${EXTRA_VARS_FILE} \
+          -e cluster_image=${{ steps.build.outputs.CLUSTER_IMAGE }} \
+          -e cluster_name="caas-ci-${GITHUB_SHA::7}" \
+          slurm-infra.yml
+        env:
+          SLURM_INFRA_HIDE_DEBUG_OUTPUT: True
+        if: success()
+
+      - name: Remove cluster based on the new OHPC image
+        run: |
+          source venv/bin/activate
+          ansible-playbook \
+          -i image-build/hosts \
+          -e @${EXTRA_VARS_FILE} \
+          -e cluster_image=${{ steps.build.outputs.CLUSTER_IMAGE }} \
+          -e cluster_state=absent \
+          -e cluster_name="caas-ci-${GITHUB_SHA::7}" \
+          slurm-infra.yml
+        if: |
+          ( success() || failure() || cancelled() ) && 
+          steps.build.outcome == 'success'
+
+      - name: Delete built image after testing
+        run: |
+          source venv/bin/activate
+          ansible-playbook \
+          -i image-build/hosts \
+          -e cluster_image=${{ steps.build.outputs.CLUSTER_IMAGE }} \
+          -e '{"cluster_image_delete": true}' \
+          image-build/image-delete-or-promote.yml
+        if: |
+          ( success() || failure() || cancelled() ) && 
+          steps.build.outcome == 'success' && 
+          github.event_name == 'pull_request'
+
+      - name: Promote built image from Private to Community after testing
+        run: |
+          source venv/bin/activate
+          ansible-playbook \
+          -i image-build/hosts \
+          -e cluster_image=${{ steps.build.outputs.CLUSTER_IMAGE }} \
+          -e '{"cluster_image_promote_community": true}' \
+          image-build/image-delete-or-promote.yml
+        if: |
+          success() && 
+          steps.build.outcome == 'success' && 
+          steps.deploy.outcome == 'success' &&
+          (( github.event_name == 'workflow_dispatch' && inputs.promote_community == true ) 
+          || github.event_name == 'push' )
+
+      - name: Upload packer build log artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: packer-build-log
+          path: ${{ github.workspace }}/packer-build.log
+        if: failure() || success() || cancelled()

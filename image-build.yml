@@ -21,4 +21,12 @@
       - name: Print cluster_image UUID
         debug:
           msg: "{{ cluster_image }}"
+
+      - name: Write cluster_image UUID to file
+        copy:
+          dest: "{{ playbook_dir }}/cluster_image_uuid.txt"
+          content: "{{ cluster_image }}"
+        when:
+          - write_cluster_image_uuid_file is defined
+          - write_cluster_image_uuid_file
       when: cluster_state is not defined or (cluster_state is defined and cluster_state != "absent")

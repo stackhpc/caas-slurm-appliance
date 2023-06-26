@@ -1,0 +1,23 @@
+- hosts: openstack
+  tasks:
+    - block:
+        # Use command module because openstack.image doesn't
+        # support setting the community property
+      - name: Set image community property
+        command:
+          cmd: >-
+            openstack image set --community {{ cluster_image }}
+        changed_when: true
+        when:
+          - cluster_image_promote_community is defined
+          - cluster_image_promote_community
+
+      - name: Delete image
+        openstack.cloud.image:
+          name: "{{ cluster_image }}"
+          state: absent
+        when:
+          - cluster_image_delete is defined
+          - cluster_image_delete
+
+      when: cluster_image is defined

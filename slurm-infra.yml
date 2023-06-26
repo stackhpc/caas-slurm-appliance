@@ -121,8 +121,12 @@
 
 # Write the outputs as the final task
 - hosts: localhost
+  vars:
+    hide_debug_outputs: "{{ lookup('ansible.builtin.env', 'SLURM_INFRA_HIDE_DEBUG_OUTPUT', default=false) | bool }}"
   tasks:
     - debug: var=outputs
+      when:
+        - not hide_debug_outputs
       vars:
         # Ansible has a fit when there are two 'hostvars' evaluations in a resolution chain,
         # so we have to repeat logic here unfortunately
