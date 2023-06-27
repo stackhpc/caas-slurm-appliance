@@ -6,7 +6,7 @@ roles:
     version: v0.20.0 # Allow multiple empty partitions by @sjpb in #156
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
-    version: 62dd0e1534ad54d770e541491ee9570bbcb3f698 # feature/no-install
+    version: 6f636475d54efa48b06e1a614fa39acdb1fefdb9 # fix/remove-warn
     name: cloudalchemy.node_exporter
   - src: https://github.com/cloudalchemy/ansible-prometheus.git
     version: 4d2c8d742de39e50387e0aa6d5510b21c7451343 # need fix in preceeding commit for rocky
