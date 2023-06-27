@@ -42,4 +42,4 @@ collections:
     version: 2.1.0
   - name: https://github.com/stackhpc/ansible-collection-terraform
     type: git
-    version: 273f8ff949e06b49f97306582382da2e7ecf4f8e # update/dependencies-20230626
+    version: 1a8f5af0239de2bfedb37f51e20d973e05699b8a # main @ 20230627
