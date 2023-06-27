@@ -37,6 +37,8 @@ collections:
     version: 7.1.0
   - name: community.crypto
     version: 2.10.0
+  - name: community.mysql
+    version: 3.7.2
   - name: openstack.cloud
     version: 2.1.0
   - name: https://github.com/stackhpc/ansible-collection-terraform
