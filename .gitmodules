@@ -1,3 +1,4 @@
 [submodule "vendor/stackhpc/ansible-slurm-appliance"]
 	path = vendor/stackhpc/ansible-slurm-appliance
 	url = https://github.com/stackhpc/ansible-slurm-appliance.git
+	branch = fix/caas-crd
