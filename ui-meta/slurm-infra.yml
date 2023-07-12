@@ -44,7 +44,7 @@ parameters:
     kind: cloud.size
     immutable: true
     options:
-      count_variable: compute_count
+      count_parameter: compute_count
       min_ram: 2048
       min_disk: 20
   
