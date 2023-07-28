@@ -379,7 +379,11 @@ resource "openstack_compute_instance_v2" "{{ partition.name }}" {
 
   name      = "{{ cluster_name }}-compute-{{ partition.name }}-${count.index}"
   image_id  = "{{ cluster_previous_image | default(cluster_image) }}"
+  {% if 'flavor_name' in partition %}
   flavor_name = "{{ partition.flavor_name }}"
+  {% else %}
+  flavor_id = "{{ partition.flavor }}"
+  {% endif %}
 
   network {
     port = openstack_networking_port_v2.{{ partition.name }}[count.index].id
