@@ -27,7 +27,6 @@ parameters:
     immutable: true
     options:
       min_ram: 2048
-      min_disk: 20
   
   - name: home_volume_size
     label: Home volume size (GB)
