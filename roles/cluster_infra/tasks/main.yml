@@ -63,13 +63,16 @@
       openstack.cloud.image_info:
         image: "{{ cluster_previous_image | default(cluster_image) }}"
       register: cluster_image_info
-
+    - name: Check only single image found
+      assert:
+        that: cluster_image_info.images | length == 1
+        fail_msg: "Multiple images found for 'cluster_image' {{ cluster_image }}"
     - name: Set volume_device_prefix fact
       set_fact:
         block_device_prefix: >-
            {{
-              'sd' if cluster_image_info.image.metadata.hw_scsi_model is defined and
-              cluster_image_info.image.metadata.hw_scsi_model in scsi_models
+              'sd' if (cluster_image_info.images | first).hw_scsi_model is defined and
+              (cluster_image_info.images | first).hw_scsi_model in scsi_models
               else 'vd'
            }}
   # Only run when block_device_prefix isn't set as an extravar
